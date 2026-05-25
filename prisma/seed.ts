@@ -1,7 +1,6 @@
-import { PrismaClient, Role } from '@prisma/client';
+import { Role } from '@prisma/client';
 import bcrypt from 'bcryptjs';
-
-const prisma = new PrismaClient();
+import { prisma } from '../src/config/db';
 
 async function main() {
   console.log('🌱 Starting database seeding...');
@@ -14,11 +13,9 @@ async function main() {
     where: { email: adminEmail },
   });
 
-  let adminId = '';
-
   if (!existingAdmin) {
     const hashedPassword = await bcrypt.hash('Admin123!', 12);
-    const admin = await prisma.user.create({
+    await prisma.user.create({
       data: {
         name: 'Jivanjor Admin',
         email: adminEmail,
@@ -26,10 +23,8 @@ async function main() {
         role: Role.ADMIN,
       },
     });
-    adminId = admin.id;
     console.log(`✅ Admin user seeded: ${adminEmail} (password: Admin123!)`);
   } else {
-    adminId = existingAdmin.id;
     console.log('ℹ️ Admin user already exists.');
   }
 
@@ -76,7 +71,7 @@ async function main() {
     },
   });
 
-  const pvcAdhesives = await prisma.productCategory.create({
+  await prisma.productCategory.create({
     data: {
       name: 'PVC & Pipe Cements',
       slug: 'pvc-pipe-cements',
@@ -146,7 +141,7 @@ async function main() {
     },
   });
 
-  const prod2 = await prisma.product.create({
+  await prisma.product.create({
     data: {
       name: 'Jivanjor WaterShield 2K',
       slug: 'jivanjor-watershield-2k',
@@ -161,7 +156,7 @@ async function main() {
     },
   });
 
-  const prod3 = await prisma.product.create({
+  await prisma.product.create({
     data: {
       name: 'Jivanjor PolySeal Max',
       slug: 'jivanjor-polyseal-max',
