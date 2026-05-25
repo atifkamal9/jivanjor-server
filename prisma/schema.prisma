@@ -1,0 +1,125 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+model User {
+  id        String   @id @default(uuid()) @db.VarChar(36)
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(USER)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+model ProductCategory {
+  id          String            @id @default(uuid()) @db.VarChar(36)
+  name        String
+  slug        String            @unique
+  parentId    String?           @map("parent_id") @db.VarChar(36)
+  description String?           @db.Text
+  createdAt   DateTime          @default(now()) @map("created_at")
+  updatedAt   DateTime          @updatedAt @map("updated_at")
+
+  // Relationships
+  parent      ProductCategory?  @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
+  children    ProductCategory[] @relation("CategoryHierarchy")
+  products    Product[]
+
+  @@map("product_categories")
+}
+
+model Material {
+  id           String    @id @default(uuid()) @db.VarChar(36)
+  materialName String    @map("material_name")
+  description  String?   @db.Text
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  // Relationships
+  products     Product[]
+
+  @@map("materials")
+}
+
+model Product {
+  id          String   @id @default(uuid()) @db.VarChar(36)
+  name        String
+  slug        String   @unique
+  description String   @db.Text
+  categoryId  String   @map("category_id") @db.VarChar(36)
+  materialId  String?  @map("material_id") @db.VarChar(36)
+  metadata    Json?    // Custom dynamic attributes
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relationships
+  category    ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  material    Material?       @relation(fields: [materialId], references: [id], onDelete: SetNull)
+
+  @@map("products")
+}
+
+model UseCase {
+  id          String   @id @default(uuid()) @db.VarChar(36)
+  title       String
+  slug        String   @unique
+  description String   @db.Text
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("use_cases")
+}
+
+model Issue {
+  id         String   @id @default(uuid()) @db.VarChar(36)
+  issueTitle String   @map("issue_title")
+  slug       String   @unique
+  problem    String   @db.Text
+  solution   String   @db.Text
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@map("issues")
+}
+
+model BlogPost {
+  id          String   @id @default(uuid()) @db.VarChar(36)
+  title       String
+  slug        String   @unique
+  content     String   @db.Text
+  category    String   // Tag/category group name
+  tags        Json?    // Array of tags (e.g. ["plumbing", "adhesive"])
+  author      String
+  publishDate DateTime @default(now()) @map("publish_date")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("blog_posts")
+}
+
+model SEOMetadata {
+  id              String   @id @default(uuid()) @db.VarChar(36)
+  pageType        String   @map("page_type") // e.g. "PRODUCT", "CATEGORY", "MATERIAL", "USE_CASE", "ISSUE", "BLOG", "STATIC"
+  pageId          String?  @map("page_id")   // ID of target resource, if applicable
+  metaTitle       String   @map("meta_title")
+  metaDescription String   @db.Text @map("meta_description")
+  canonicalUrl    String?  @map("canonical_url")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@unique([pageType, pageId])
+  @@map("seo_metadata")
+}

@@ -1,0 +1,161 @@
+import { z } from 'zod';
+
+// ==========================================
+// Authentication Schemas
+// ==========================================
+
+export const registerSchema = z.object({
+  body: z.object({
+    name: z.string().min(2, 'Name must be at least 2 characters'),
+    email: z.string().email('Invalid email format'),
+    password: z.string().min(6, 'Password must be at least 6 characters'),
+    role: z.enum(['ADMIN', 'USER']).optional(),
+  }),
+});
+
+export const loginSchema = z.object({
+  body: z.object({
+    email: z.string().email('Invalid email format'),
+    password: z.string().min(1, 'Password is required'),
+  }),
+});
+
+// ==========================================
+// Category Schemas
+// ==========================================
+
+export const createCategorySchema = z.object({
+  body: z.object({
+    name: z.string().min(2, 'Category name must be at least 2 characters'),
+    parentId: z.string().uuid('Invalid parent category ID').nullable().optional(),
+    description: z.string().optional(),
+  }),
+});
+
+export const updateCategorySchema = z.object({
+  body: z.object({
+    name: z.string().min(2, 'Category name must be at least 2 characters').optional(),
+    parentId: z.string().uuid('Invalid parent category ID').nullable().optional(),
+    description: z.string().optional(),
+  }),
+});
+
+// ==========================================
+// Material Schemas
+// ==========================================
+
+export const createMaterialSchema = z.object({
+  body: z.object({
+    materialName: z.string().min(2, 'Material name must be at least 2 characters'),
+    description: z.string().optional(),
+  }),
+});
+
+export const updateMaterialSchema = z.object({
+  body: z.object({
+    materialName: z.string().min(2, 'Material name must be at least 2 characters').optional(),
+    description: z.string().optional(),
+  }),
+});
+
+// ==========================================
+// Product Schemas
+// ==========================================
+
+export const createProductSchema = z.object({
+  body: z.object({
+    name: z.string().min(2, 'Product name must be at least 2 characters'),
+    description: z.string().min(5, 'Description must be at least 5 characters'),
+    categoryId: z.string().uuid('Invalid category ID'),
+    materialId: z.string().uuid('Invalid material ID').nullable().optional(),
+    metadata: z.record(z.any()).optional(), // JSON object for dynamic specs
+  }),
+});
+
+export const updateProductSchema = z.object({
+  body: z.object({
+    name: z.string().min(2, 'Product name must be at least 2 characters').optional(),
+    description: z.string().min(5, 'Description must be at least 5 characters').optional(),
+    categoryId: z.string().uuid('Invalid category ID').optional(),
+    materialId: z.string().uuid('Invalid material ID').nullable().optional(),
+    metadata: z.record(z.any()).optional(),
+  }),
+});
+
+// ==========================================
+// Use Case Schemas
+// ==========================================
+
+export const createUseCaseSchema = z.object({
+  body: z.object({
+    title: z.string().min(2, 'Title must be at least 2 characters'),
+    description: z.string().min(5, 'Description must be at least 5 characters'),
+  }),
+});
+
+export const updateUseCaseSchema = z.object({
+  body: z.object({
+    title: z.string().min(2, 'Title must be at least 2 characters').optional(),
+    description: z.string().min(5, 'Description must be at least 5 characters').optional(),
+  }),
+});
+
+// ==========================================
+// Issue Schemas
+// ==========================================
+
+export const createIssueSchema = z.object({
+  body: z.object({
+    issueTitle: z.string().min(2, 'Issue title must be at least 2 characters'),
+    problem: z.string().min(5, 'Problem must be at least 5 characters'),
+    solution: z.string().min(5, 'Solution must be at least 5 characters'),
+  }),
+});
+
+export const updateIssueSchema = z.object({
+  body: z.object({
+    issueTitle: z.string().min(2, 'Issue title must be at least 2 characters').optional(),
+    problem: z.string().min(5, 'Problem must be at least 5 characters').optional(),
+    solution: z.string().min(5, 'Solution must be at least 5 characters').optional(),
+  }),
+});
+
+// ==========================================
+// Blog Post Schemas
+// ==========================================
+
+export const createBlogSchema = z.object({
+  body: z.object({
+    title: z.string().min(2, 'Title must be at least 2 characters'),
+    content: z.string().min(10, 'Content must be at least 10 characters'),
+    category: z.string().min(2, 'Category must be at least 2 characters'),
+    tags: z.array(z.string()).optional(),
+    author: z.string().min(2, 'Author must be at least 2 characters'),
+    publishDate: z.string().datetime('Invalid publish date format').optional(),
+  }),
+});
+
+export const updateBlogSchema = z.object({
+  body: z.object({
+    title: z.string().min(2, 'Title must be at least 2 characters').optional(),
+    content: z.string().min(10, 'Content must be at least 10 characters').optional(),
+    category: z.string().min(2, 'Category must be at least 2 characters').optional(),
+    tags: z.array(z.string()).optional(),
+    author: z.string().min(2, 'Author must be at least 2 characters').optional(),
+    publishDate: z.string().datetime('Invalid publish date format').optional(),
+  }),
+});
+
+// ==========================================
+// SEO Metadata Schemas
+// ==========================================
+
+export const createOrUpdateSEOSchema = z.object({
+  body: z.object({
+    pageType: z.enum(['PRODUCT', 'CATEGORY', 'MATERIAL', 'USE_CASE', 'ISSUE', 'BLOG', 'STATIC']),
+    pageId: z.string().uuid('Invalid page ID').nullable().optional(),
+    metaTitle: z.string().min(2, 'Meta title must be at least 2 characters'),
+    metaDescription: z.string().min(5, 'Meta description must be at least 5 characters'),
+    canonicalUrl: z.string().url('Invalid canonical URL format').nullable().optional(),
+  }),
+});
