@@ -294,6 +294,167 @@ async function main() {
 
   console.log('✅ SEO Metadata seeded.');
 
+  // ==========================================
+  // 9. Seed Page Templates
+  // ==========================================
+  console.log('Page Template seeding...');
+  await prisma.pageTemplate.deleteMany();
+
+  await prisma.pageTemplate.create({
+    data: {
+      name: 'Default Woodworking Landing Page',
+      slug: 'home-default-woodworking',
+      pageType: 'HOME',
+      isActive: true,
+      sections: {
+        hero: {
+          title: 'Dependable Bonds for Indian Homes',
+          subtitle: 'Superior strength adhesives crafted with state-of-the-art polymer chemistry to safeguard your woodworking and furniture creations for a lifetime.',
+          badgeText: 'JJ QUALITY LABS',
+          backgroundImage: '/images/hero-bg.jpg',
+          ctaText: 'Explore Products',
+          ctaLink: '/products',
+          videoText: 'Watch Laboratory Test',
+          videoUrl: 'https://www.youtube.com/watch?v=mock-lab-test',
+          videoThumbnail: '/images/hero-video-thumb.jpg'
+        },
+        adhesiveRange: {
+          title: 'A Complete Adhesive Range for Modern Woodworking',
+          subtitle: 'From premium wood glues to water-resistant formulations, explore adhesives trusted by master carpenters across India.',
+          items: [
+            {
+              id: 'champ-super',
+              name: 'Champion Super',
+              description: 'Premium white carpentry adhesive providing superior initial grab and high bonding strength.',
+              imageUrl: '/images/products/champion-super.jpg',
+              tag: 'Best Seller',
+              features: ['4-hour drying time', 'Termite resistant', 'High coverage']
+            },
+            {
+              id: 'fast-bond',
+              name: 'FastBond',
+              description: 'Fast-drying polymer glue designed to reduce assembly times for fast-track modular fittings.',
+              imageUrl: '/images/products/fastbond.jpg',
+              tag: 'Quick Setting',
+              features: ['2-hour setting', 'High initial green strength', 'Heat resistant']
+            },
+            {
+              id: 'water-shield',
+              name: 'WaterShield 2K',
+              description: 'Acrylic-modified waterproofing glue that acts as a reliable moisture barrier for wet areas.',
+              imageUrl: '/images/products/watershield.jpg',
+              tag: 'Water Resistant',
+              features: ['D3 moisture grade', 'Excellent adhesion', 'Flexibility']
+            }
+          ]
+        },
+        findAdhesive: {
+          title: 'Find The Right Adhesive',
+          subtitle: 'Select your application category to discover matched adhesives engineered for maximum hold.',
+          items: [
+            { name: 'Furniture & Woodwork', iconName: 'sofa', link: '/categories/wood-adhesives' },
+            { name: 'Waterproofing & Coatings', iconName: 'droplet', link: '/categories/roof-waterproofing' },
+            { name: 'Sealants & Silicones', iconName: 'paint-brush', link: '/categories/sealants-silicones' },
+            { name: 'PVC & Pipe Cements', iconName: 'wrench', link: '/categories/pvc-pipe-cements' },
+            { name: 'Tape & Bonding Roll', iconName: 'tape', link: '/products?tag=tapes' },
+            { name: 'Grout & Repair Fillers', iconName: 'shield', link: '/products?tag=repair' }
+          ]
+        },
+        whyTrustUs: {
+          title: 'Why Professionals Trust Jivanjor',
+          subtitle: 'Over decades, builders and contractors have endorsed Jivanjor for quality, innovation, and support.',
+          items: [
+            { title: 'Consistent Quality', description: 'Every batch is rigorously tested in our labs to ensure matching bonding performance.', iconName: 'award' },
+            { title: 'Ease of Application', description: 'Engineered viscosity allows smooth, even spreading with minimal effort.', iconName: 'check-circle' },
+            { title: 'Range of Products', description: 'A tailored product for every surface—from solid wood to rigid PVC and terrace concrete.', iconName: 'layers' },
+            { title: 'Preferred by Experts', description: 'Loved by leading interior designers, architects, and professional carpentry guilds.', iconName: 'users' }
+          ]
+        },
+        showcaseGrid: {
+          title: "Built Around India's Woodworking Professionals",
+          subtitle: 'Empowering woodworking communities with tools, training, and resources to scale their craftsmanship.',
+          items: [
+            {
+              title: 'Technical Resources',
+              description: 'Step-by-step tutorials, safety datasheets, and best practices for modern carpenter guilds.',
+              imageUrl: '/images/showcase/technical-resources.jpg',
+              link: '/resources'
+            },
+            {
+              title: 'Our Market Presence',
+              description: 'Available at 15,000+ retail outlets across India, backed by robust distribution networks.',
+              imageUrl: '/images/showcase/market-presence.jpg',
+              link: '/outlets'
+            },
+            {
+              title: 'Industry Endorsed',
+              description: 'Recognized by woodworking associations for superior chemical safety and durability.',
+              imageUrl: '/images/showcase/industry-endorsed.jpg',
+              link: '/certifications'
+            }
+          ]
+        },
+        ctaPromo: {
+          title: 'Grow Your Business With a Trusted Adhesive',
+          subtitle: 'Connect with a Jivanjor representative today to get bulk pricing, specialized product trainings, and contractor loyalty rewards.',
+          backgroundImage: '/images/cta-promo-bg.jpg',
+          ctaText: 'Join Partner Network',
+          ctaLink: '/contact'
+        },
+        testimonials: {
+          title: 'Trusted by People Who Know the Work',
+          subtitle: 'Hear from professional contractors and carpenters who build their reputation on Jivanjor daily.',
+          videos: [
+            {
+              author: 'Aarav Mehta',
+              role: 'Master Carpenter, Mumbai',
+              videoUrl: 'https://www.youtube.com/watch?v=testimonial-1',
+              thumbnailUrl: '/images/testimonials/aarav-mehta.jpg'
+            },
+            {
+              author: 'Rajesh Sharma',
+              role: 'Contractor, Delhi NCR',
+              videoUrl: 'https://www.youtube.com/watch?v=testimonial-2',
+              thumbnailUrl: '/images/testimonials/rajesh-sharma.jpg'
+            },
+            {
+              author: 'Amit Verma',
+              role: 'Modular Kitchen Specialist, Bangalore',
+              videoUrl: 'https://www.youtube.com/watch?v=testimonial-3',
+              thumbnailUrl: '/images/testimonials/amit-verma.jpg'
+            }
+          ]
+        },
+        knowledgeBase: {
+          title: 'Knowledge Base & Guides',
+          subtitle: 'Explore insights, tips, and chemistry guides from our experts to optimize your bonding applications.',
+          items: [
+            {
+              title: 'Choosing the Right Adhesive',
+              summary: 'A masterclass on selecting between standard PVA, quick-drying fast bonds, and high-performance polyurethanes.',
+              imageUrl: '/images/guides/choose-adhesive.jpg',
+              link: '/blogs/choosing-the-right-adhesive-for-carpentry'
+            },
+            {
+              title: 'Application Tips',
+              summary: 'Pro tips for surface preparation, wood moisture content checks, clamping times, and curing environment controls.',
+              imageUrl: '/images/guides/application-tips.jpg',
+              link: '/blogs/ultimate-waterproofing-guide-for-homeowners'
+            },
+            {
+              title: 'Fix Common Issues',
+              summary: 'Learn how to easily prevent wood laminate bubbling, edge peeling, and joint cracking in high-humidity climates.',
+              imageUrl: '/images/guides/fix-issues.jpg',
+              link: '/issues'
+            }
+          ]
+        }
+      }
+    }
+  });
+
+  console.log('✅ Page Templates seeded.');
+
   console.log('\n🎉 Seeding completed successfully!');
 }
 

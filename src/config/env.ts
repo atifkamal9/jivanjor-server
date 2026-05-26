@@ -5,7 +5,7 @@ import path from 'path';
 dotenv.config({ path: path.join(__dirname, '../../.env') });
 
 export const env = {
-  PORT: parseInt(process.env.PORT || '5000', 10),
+  PORT: parseInt(process.env.PORT || '8000', 10),
   NODE_ENV: process.env.NODE_ENV || 'development',
   DATABASE_URL: process.env.DATABASE_URL || 'mysql://root:password@localhost:3306/jivanjor',
   JWT_SECRET: process.env.JWT_SECRET || 'jivanjor_development_secret_key_987654321_abc_xyz',

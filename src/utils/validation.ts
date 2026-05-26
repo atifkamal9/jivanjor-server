@@ -159,3 +159,24 @@ export const createOrUpdateSEOSchema = z.object({
     canonicalUrl: z.string().url('Invalid canonical URL format').nullable().optional(),
   }),
 });
+
+// ==========================================
+// Page Template Schemas
+// ==========================================
+
+export const createTemplateSchema = z.object({
+  body: z.object({
+    name: z.string().min(2, 'Name must be at least 2 characters'),
+    pageType: z.string().min(2, 'Page type must be at least 2 characters'),
+    sections: z.record(z.any()).describe('JSON structure of layout sections'),
+  }),
+});
+
+export const updateTemplateSchema = z.object({
+  body: z.object({
+    name: z.string().min(2, 'Name must be at least 2 characters').optional(),
+    pageType: z.string().min(2, 'Page type must be at least 2 characters').optional(),
+    sections: z.record(z.any()).optional(),
+    isActive: z.boolean().optional(),
+  }),
+});
