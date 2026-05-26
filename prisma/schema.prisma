@@ -122,3 +122,16 @@ model SEOMetadata {
   @@unique([pageType, pageId])
   @@map("seo_metadata")
 }
+
+model PageTemplate {
+  id        String   @id @default(uuid()) @db.VarChar(36)
+  name      String
+  slug      String   @unique
+  pageType  String   @map("page_type") // e.g. "HOME"
+  isActive  Boolean  @default(false) @map("is_active")
+  sections  Json     // High-fidelity JSON storing sections, banners, text grids, dynamic media, etc.
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("page_templates")
+}

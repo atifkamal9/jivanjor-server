@@ -12,6 +12,7 @@ import useCaseRouter from './routes/useCase.routes';
 import issueRouter from './routes/issue.routes';
 import blogRouter from './routes/blog.routes';
 import seoRouter from './routes/seo.routes';
+import templateRouter from './routes/template.routes';
 
 const app = express();
 
@@ -38,6 +39,7 @@ app.use('/api/use-cases', useCaseRouter);
 app.use('/api/issues', issueRouter);
 app.use('/api/blogs', blogRouter);
 app.use('/api/seo', seoRouter);
+app.use('/api/templates', templateRouter);
 
 // Fallback for unhandled routes
 app.all('*', (req, res, next) => {
