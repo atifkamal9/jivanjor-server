@@ -7,7 +7,7 @@ export class MaterialController {
   /**
    * Get all materials
    */
-  static getAll = catchAsync(async (req: Request, res: Response) => {
+  static getAll = catchAsync(async (_req: Request, res: Response) => {
     const materials = await MaterialService.getAll();
     return res.status(HttpCode.OK).json({
       status: 'success',

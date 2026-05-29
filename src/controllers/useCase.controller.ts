@@ -7,7 +7,7 @@ export class UseCaseController {
   /**
    * Get all use cases
    */
-  static getAll = catchAsync(async (req: Request, res: Response) => {
+  static getAll = catchAsync(async (_req: Request, res: Response) => {
     const useCases = await UseCaseService.getAll();
     return res.status(HttpCode.OK).json({
       status: 'success',

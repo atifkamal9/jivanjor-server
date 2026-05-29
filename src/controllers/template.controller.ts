@@ -7,7 +7,7 @@ export class TemplateController {
   /**
    * Get all templates
    */
-  static getAll = catchAsync(async (req: Request, res: Response) => {
+  static getAll = catchAsync(async (_req: Request, res: Response) => {
     const templates = await TemplateService.getAll();
     return res.status(HttpCode.OK).json({
       status: 'success',

@@ -5,10 +5,10 @@ import { env } from '../config/env';
 
 export const errorHandler = (
   err: Error,
-  req: Request,
+  _req: Request,
   res: Response,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  next: NextFunction
+  _next: NextFunction
 ) => {
   console.error(`[Error Handler] Error occurred:`, err);
 

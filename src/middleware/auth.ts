@@ -21,7 +21,7 @@ declare global {
 /**
  * Protect routes - Authenticate JWT token
  */
-export const protect = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+export const protect = catchAsync(async (req: Request, _res: Response, next: NextFunction) => {
   let token: string | undefined;
 
   // 1. Extract token from Bearer header
@@ -59,7 +59,7 @@ export const protect = catchAsync(async (req: Request, res: Response, next: Next
  * Restrict routes to specific user roles
  */
 export const restrictTo = (...roles: string[]) => {
-  return (req: Request, res: Response, next: NextFunction) => {
+  return (req: Request, _res: Response, next: NextFunction) => {
     if (!req.user || !roles.includes(req.user.role)) {
       return next(new AppError('You do not have permission to perform this action.', HttpCode.FORBIDDEN));
     }
