@@ -10,6 +10,8 @@ const adapter = new PrismaMariaDb({
   user: decodeURIComponent(parsedUrl.username),
   password: decodeURIComponent(parsedUrl.password),
   database: decodeURIComponent(parsedUrl.pathname.substring(1)),
+  connectTimeout: 20000,
+  acquireTimeout: 20000,
 });
 
 export const prisma = new PrismaClient({ adapter });
