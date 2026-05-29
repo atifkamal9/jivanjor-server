@@ -7,7 +7,7 @@ import { createTemplateSchema, updateTemplateSchema } from '../utils/validation'
 const router = Router();
 
 // Public routes
-router.get('/active/:pageType', TemplateController.getActive);
+router.get('/active/page/:pageSlug', TemplateController.getActive);
 router.get('/:idOrSlug', TemplateController.getOne);
 router.get('/', TemplateController.getAll);
 

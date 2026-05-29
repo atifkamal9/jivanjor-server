@@ -35,28 +35,33 @@ export class TemplateService {
   }
 
   /**
-   * Get the active template for a page type
+   * Get active template for a Page Slug
    */
-  static async getActive(pageType: string) {
-    const template = await prisma.pageTemplate.findFirst({
-      where: {
-        pageType: pageType.toUpperCase(),
-        isActive: true,
+  static async getActiveForPageSlug(pageSlug: string) {
+    // First, verify page exists and load its active template
+    const page = await prisma.page.findUnique({
+      where: { slug: pageSlug },
+      include: {
+        activeTemplate: true,
       },
     });
 
-    if (!template) {
-      throw new AppError(`No active template found for page type ${pageType}`, HttpCode.NOT_FOUND);
+    if (!page) {
+      throw new AppError(`Page with slug '${pageSlug}' not found`, HttpCode.NOT_FOUND);
     }
 
-    return template;
+    if (!page.activeTemplate) {
+      throw new AppError(`No active template selected for page '${page.title}'`, HttpCode.NOT_FOUND);
+    }
+
+    return page.activeTemplate;
   }
 
   /**
-   * Create a new template
+   * Create a new template (globally decoupled)
    */
   static async create(input: CreateTemplateInput) {
-    const { name, pageType, sections } = input;
+    const { name, sections } = input;
     const slug = slugify(name);
 
     // Validate uniqueness of slug
@@ -71,18 +76,16 @@ export class TemplateService {
       data: {
         name,
         slug,
-        pageType: pageType.toUpperCase(),
-        isActive: false,
         sections: sections as any,
       },
     });
   }
 
   /**
-   * Update a template
+   * Update a template (globally decoupled)
    */
   static async update(id: string, input: UpdateTemplateInput) {
-    const { name, pageType, sections, isActive } = input;
+    const { name, sections } = input;
 
     // Verify template exists
     const template = await prisma.pageTemplate.findUnique({
@@ -110,16 +113,8 @@ export class TemplateService {
       }
     }
 
-    if (pageType) {
-      dataToUpdate.pageType = pageType.toUpperCase();
-    }
-
     if (sections) {
       dataToUpdate.sections = sections;
-    }
-
-    if (isActive !== undefined) {
-      dataToUpdate.isActive = isActive;
     }
 
     return prisma.pageTemplate.update({
@@ -139,13 +134,25 @@ export class TemplateService {
       throw new AppError('Template not found', HttpCode.NOT_FOUND);
     }
 
+    // If this template is currently active for any page, nullify the pointer
+    const activePages = await prisma.page.findMany({
+      where: { activeTemplateId: id },
+    });
+
+    if (activePages.length > 0) {
+      await prisma.page.updateMany({
+        where: { activeTemplateId: id },
+        data: { activeTemplateId: null },
+      });
+    }
+
     return prisma.pageTemplate.delete({
       where: { id },
     });
   }
 
   /**
-   * Activate a template for its page type (setting all others of same pageType to false)
+   * Activate a template (Deprecated inside TemplateService as template page-mapping is handled directly at Page levels)
    */
   static async activate(id: string) {
     const template = await prisma.pageTemplate.findUnique({
@@ -154,21 +161,6 @@ export class TemplateService {
     if (!template) {
       throw new AppError('Template not found', HttpCode.NOT_FOUND);
     }
-
-    // Set all other templates of same pageType to inactive, and this one to active
-    await prisma.$transaction([
-      prisma.pageTemplate.updateMany({
-        where: {
-          pageType: template.pageType,
-          id: { not: id },
-        },
-        data: { isActive: false },
-      }),
-      prisma.pageTemplate.update({
-        where: { id },
-        data: { isActive: true },
-      }),
-    ]);
 
     return this.getByIdOrSlug(id);
   }

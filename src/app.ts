@@ -13,6 +13,7 @@ import issueRouter from './routes/issue.routes';
 import blogRouter from './routes/blog.routes';
 import seoRouter from './routes/seo.routes';
 import templateRouter from './routes/template.routes';
+import pageRouter from './routes/page.routes';
 
 const app = express();
 
@@ -22,7 +23,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Health Check API
-app.get('/health', (req, res) => {
+app.get('/health', (_req, res) => {
   res.status(200).json({
     status: 'success',
     message: 'Jivanjor Backend API is healthy and running',
@@ -40,9 +41,10 @@ app.use('/api/issues', issueRouter);
 app.use('/api/blogs', blogRouter);
 app.use('/api/seo', seoRouter);
 app.use('/api/templates', templateRouter);
+app.use('/api/pages', pageRouter);
 
 // Fallback for unhandled routes
-app.all('*', (req, res, next) => {
+app.all('*', (req, _res, next) => {
   next(new AppError(`Route ${req.originalUrl} not found on this server.`, HttpCode.NOT_FOUND));
 });
 

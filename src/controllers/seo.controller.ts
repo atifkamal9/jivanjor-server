@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { SEOService } from '../services/seo.service';
 import { catchAsync } from '../middleware/errorHandler';
 import { HttpCode, AppError } from '../utils/errors';
+import { prisma } from '../config/db';
 
 export class SEOController {
   /**
@@ -12,7 +13,12 @@ export class SEOController {
     const pageId = (req.query.pageId as string) || null;
 
     if (!pageType) {
-      throw new AppError('Query parameter pageType is required', HttpCode.BAD_REQUEST);
+      const seoList = await prisma.sEOMetadata.findMany();
+      return res.status(HttpCode.OK).json({
+        status: 'success',
+        results: seoList.length,
+        data: { seoList },
+      });
     }
 
     const seo = await SEOService.getMetadata(pageType, pageId);

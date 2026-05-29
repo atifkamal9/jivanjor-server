@@ -161,22 +161,38 @@ export const createOrUpdateSEOSchema = z.object({
 });
 
 // ==========================================
+// Page Schemas
+// ==========================================
+
+export const createPageSchema = z.object({
+  body: z.object({
+    title: z.string().min(2, 'Title must be at least 2 characters'),
+    description: z.string().optional(),
+  }),
+});
+
+export const updatePageSchema = z.object({
+  body: z.object({
+    title: z.string().min(2, 'Title must be at least 2 characters').optional(),
+    description: z.string().optional(),
+    activeTemplateId: z.string().uuid('Invalid template ID').nullable().optional(),
+  }),
+});
+
+// ==========================================
 // Page Template Schemas
 // ==========================================
 
 export const createTemplateSchema = z.object({
   body: z.object({
     name: z.string().min(2, 'Name must be at least 2 characters'),
-    pageType: z.string().min(2, 'Page type must be at least 2 characters'),
-    sections: z.record(z.any()).describe('JSON structure of layout sections'),
+    sections: z.union([z.record(z.any()), z.array(z.any())]).describe('Dynamic sections configuration (with text, paragraphs, images, videos)'),
   }),
 });
 
 export const updateTemplateSchema = z.object({
   body: z.object({
     name: z.string().min(2, 'Name must be at least 2 characters').optional(),
-    pageType: z.string().min(2, 'Page type must be at least 2 characters').optional(),
-    sections: z.record(z.any()).optional(),
-    isActive: z.boolean().optional(),
+    sections: z.union([z.record(z.any()), z.array(z.any())]).optional(),
   }),
 });

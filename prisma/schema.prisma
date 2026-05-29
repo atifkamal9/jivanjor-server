@@ -123,15 +123,31 @@ model SEOMetadata {
   @@map("seo_metadata")
 }
 
+model Page {
+  id               String        @id @default(uuid()) @db.VarChar(36)
+  title            String
+  slug             String        @unique
+  description      String?       @db.Text
+  activeTemplateId String?       @map("active_template_id") @db.VarChar(36)
+  createdAt        DateTime      @default(now()) @map("created_at")
+  updatedAt        DateTime      @updatedAt @map("updated_at")
+
+  // Relationships
+  activeTemplate   PageTemplate? @relation("ActiveTemplate", fields: [activeTemplateId], references: [id], onDelete: SetNull)
+
+  @@map("pages")
+}
+
 model PageTemplate {
   id        String   @id @default(uuid()) @db.VarChar(36)
   name      String
   slug      String   @unique
-  pageType  String   @map("page_type") // e.g. "HOME"
-  isActive  Boolean  @default(false) @map("is_active")
-  sections  Json     // High-fidelity JSON storing sections, banners, text grids, dynamic media, etc.
+  sections  Json     // Fully dynamic sections and blocks (headers, paragraphs, images, videos)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relationships
+  activeFor Page[]   @relation("ActiveTemplate")
 
   @@map("page_templates")
 }
