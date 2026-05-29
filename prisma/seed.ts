@@ -295,17 +295,24 @@ async function main() {
   console.log('✅ SEO Metadata seeded.');
 
   // ==========================================
-  // 9. Seed Page Templates
+  // 9. Seed Pages and Page Templates
   // ==========================================
-  console.log('Page Template seeding...');
+  console.log('Page and Page Template seeding...');
   await prisma.pageTemplate.deleteMany();
+  await prisma.page.deleteMany();
 
-  await prisma.pageTemplate.create({
+  const homePage = await prisma.page.create({
+    data: {
+      title: 'Home Page',
+      slug: 'home',
+      description: 'The primary dynamic landing page for the Jivanjor CMS platform.',
+    },
+  });
+
+  const homeTemplate = await prisma.pageTemplate.create({
     data: {
       name: 'Default Woodworking Landing Page',
       slug: 'home-default-woodworking',
-      pageType: 'HOME',
-      isActive: true,
       sections: {
         hero: {
           title: 'Dependable Bonds for Indian Homes',
@@ -453,7 +460,13 @@ async function main() {
     }
   });
 
-  console.log('✅ Page Templates seeded.');
+  // Explicitly update the page container with its active template ID pointer
+  await prisma.page.update({
+    where: { id: homePage.id },
+    data: { activeTemplateId: homeTemplate.id },
+  });
+
+  console.log('✅ Pages and Page Templates seeded.');
 
   console.log('\n🎉 Seeding completed successfully!');
 }

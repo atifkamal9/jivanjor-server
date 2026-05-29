@@ -7,7 +7,7 @@ export class TemplateController {
   /**
    * Get all templates
    */
-  static getAll = catchAsync(async (req: Request, res: Response) => {
+  static getAll = catchAsync(async (_req: Request, res: Response) => {
     const templates = await TemplateService.getAll();
     return res.status(HttpCode.OK).json({
       status: 'success',
@@ -28,10 +28,10 @@ export class TemplateController {
   });
 
   /**
-   * Get current active template for a page type
+   * Get current active template for a Page Slug
    */
   static getActive = catchAsync(async (req: Request, res: Response) => {
-    const template = await TemplateService.getActive(req.params.pageType);
+    const template = await TemplateService.getActiveForPageSlug(req.params.pageSlug);
     return res.status(HttpCode.OK).json({
       status: 'success',
       data: { template },

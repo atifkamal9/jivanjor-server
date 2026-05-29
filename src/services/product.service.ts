@@ -149,7 +149,7 @@ export class ProductService {
         description,
         categoryId,
         materialId,
-        metadata: metadata || null,
+        metadata: metadata,
       },
     });
   }
