@@ -14,6 +14,7 @@ import blogRouter from './routes/blog.routes';
 import seoRouter from './routes/seo.routes';
 import templateRouter from './routes/template.routes';
 import pageRouter from './routes/page.routes';
+import uploadRouter from './routes/upload.routes';
 
 const app = express();
 
@@ -42,6 +43,7 @@ app.use('/api/blogs', blogRouter);
 app.use('/api/seo', seoRouter);
 app.use('/api/templates', templateRouter);
 app.use('/api/pages', pageRouter);
+app.use('/api/upload', uploadRouter);
 
 // Fallback for unhandled routes
 app.all('*', (req, _res, next) => {
