@@ -23,7 +23,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Health Check API
-app.get('/health', (_req, res) => {
+app.get('/api/health', (_req, res) => {
   res.status(200).json({
     status: 'success',
     message: 'Jivanjor Backend API is healthy and running',
