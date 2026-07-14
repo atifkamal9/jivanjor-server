@@ -26,7 +26,7 @@ app.use(express.urlencoded({ extended: true }));
 app.get('/api/health', (_req, res) => {
   res.status(200).json({
     status: 'success',
-    message: 'Jivanjor Backend API is healthy and running',
+    message: 'Jivanjor Backend is healthy and running',
     timestamp: new Date().toISOString(),
   });
 });
