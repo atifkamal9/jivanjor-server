@@ -112,7 +112,7 @@ export class ProductService {
    * Create a product
    */
   static async create(input: CreateProductInput) {
-    const { name, description, categoryId, materialId, metadata } = input;
+    const { name, description, categoryId, materialId, metadata, image } = input;
     const slug = slugify(name);
 
     // 1. Check slug uniqueness
@@ -150,6 +150,7 @@ export class ProductService {
         categoryId,
         materialId,
         metadata: metadata,
+        image,
       },
     });
   }
@@ -158,7 +159,7 @@ export class ProductService {
    * Update product
    */
   static async update(id: string, input: UpdateProductInput) {
-    const { name, description, categoryId, materialId, metadata } = input;
+    const { name, description, categoryId, materialId, metadata, image } = input;
 
     // 1. Verify product exists
     const product = await prisma.product.findUnique({
@@ -217,6 +218,10 @@ export class ProductService {
 
     if (metadata !== undefined) {
       dataToUpdate.metadata = metadata;
+    }
+
+    if (image !== undefined) {
+      dataToUpdate.image = image;
     }
 
     return prisma.product.update({

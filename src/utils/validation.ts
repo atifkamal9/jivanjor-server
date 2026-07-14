@@ -69,6 +69,7 @@ export const createProductSchema = z.object({
     categoryId: z.string().uuid('Invalid category ID'),
     materialId: z.string().uuid('Invalid material ID').nullable().optional(),
     metadata: z.record(z.any()).optional(), // JSON object for dynamic specs
+    image: z.string().url('Invalid image URL format').optional().nullable(),
   }),
 });
 
@@ -79,6 +80,7 @@ export const updateProductSchema = z.object({
     categoryId: z.string().uuid('Invalid category ID').optional(),
     materialId: z.string().uuid('Invalid material ID').nullable().optional(),
     metadata: z.record(z.any()).optional(),
+    image: z.string().url('Invalid image URL format').optional().nullable(),
   }),
 });
 
@@ -132,6 +134,7 @@ export const createBlogSchema = z.object({
     tags: z.array(z.string()).optional(),
     author: z.string().min(2, 'Author must be at least 2 characters'),
     publishDate: z.string().datetime('Invalid publish date format').optional(),
+    image: z.string().url('Invalid image URL format').optional().nullable(),
   }),
 });
 
@@ -143,6 +146,7 @@ export const updateBlogSchema = z.object({
     tags: z.array(z.string()).optional(),
     author: z.string().min(2, 'Author must be at least 2 characters').optional(),
     publishDate: z.string().datetime('Invalid publish date format').optional(),
+    image: z.string().url('Invalid image URL format').optional().nullable(),
   }),
 });
 

@@ -60,6 +60,7 @@ model Product {
   description String
   categoryId  String   @map("category_id")
   materialId  String?  @map("material_id")
+  image       String?
   metadata    Json?    // Custom dynamic attributes
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
@@ -103,6 +104,7 @@ model BlogPost {
   tags        Json?    // Array of tags (e.g. ["plumbing", "adhesive"])
   author      String
   publishDate DateTime @default(now()) @map("publish_date")
+  image       String?
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
