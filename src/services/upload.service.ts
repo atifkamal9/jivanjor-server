@@ -78,6 +78,7 @@ export class UploadService {
       });
 
     if (error) {
+      console.error('Supabase Storage Error Details:', error);
       throw new AppError(`Storage upload failed: ${error.message}`, HttpCode.INTERNAL_SERVER_ERROR);
     }
 
