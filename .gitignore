@@ -31,5 +31,5 @@ Thumbs.db
 *.sln
 *.sw?
 
-# Lock file
-package-lock.json
+# Lock file (kept for Railway deployment)
+# package-lock.json

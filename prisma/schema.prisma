@@ -1,5 +1,5 @@
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
 }
 
 generator client {
@@ -12,7 +12,7 @@ enum Role {
 }
 
 model User {
-  id        String   @id @default(uuid()) @db.VarChar(36)
+  id        String   @id @default(uuid())
   name      String
   email     String   @unique
   password  String
@@ -24,11 +24,11 @@ model User {
 }
 
 model ProductCategory {
-  id          String            @id @default(uuid()) @db.VarChar(36)
+  id          String            @id @default(uuid())
   name        String
   slug        String            @unique
-  parentId    String?           @map("parent_id") @db.VarChar(36)
-  description String?           @db.Text
+  parentId    String?           @map("parent_id")
+  description String?
   createdAt   DateTime          @default(now()) @map("created_at")
   updatedAt   DateTime          @updatedAt @map("updated_at")
 
@@ -41,9 +41,9 @@ model ProductCategory {
 }
 
 model Material {
-  id           String    @id @default(uuid()) @db.VarChar(36)
+  id           String    @id @default(uuid())
   materialName String    @map("material_name")
-  description  String?   @db.Text
+  description  String?
   createdAt    DateTime  @default(now()) @map("created_at")
   updatedAt    DateTime  @updatedAt @map("updated_at")
 
@@ -54,12 +54,12 @@ model Material {
 }
 
 model Product {
-  id          String   @id @default(uuid()) @db.VarChar(36)
+  id          String   @id @default(uuid())
   name        String
   slug        String   @unique
-  description String   @db.Text
-  categoryId  String   @map("category_id") @db.VarChar(36)
-  materialId  String?  @map("material_id") @db.VarChar(36)
+  description String
+  categoryId  String   @map("category_id")
+  materialId  String?  @map("material_id")
   metadata    Json?    // Custom dynamic attributes
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
@@ -72,10 +72,10 @@ model Product {
 }
 
 model UseCase {
-  id          String   @id @default(uuid()) @db.VarChar(36)
+  id          String   @id @default(uuid())
   title       String
   slug        String   @unique
-  description String   @db.Text
+  description String
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
@@ -83,11 +83,11 @@ model UseCase {
 }
 
 model Issue {
-  id         String   @id @default(uuid()) @db.VarChar(36)
+  id         String   @id @default(uuid())
   issueTitle String   @map("issue_title")
   slug       String   @unique
-  problem    String   @db.Text
-  solution   String   @db.Text
+  problem    String
+  solution   String
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
 
@@ -95,10 +95,10 @@ model Issue {
 }
 
 model BlogPost {
-  id          String   @id @default(uuid()) @db.VarChar(36)
+  id          String   @id @default(uuid())
   title       String
   slug        String   @unique
-  content     String   @db.Text
+  content     String
   category    String   // Tag/category group name
   tags        Json?    // Array of tags (e.g. ["plumbing", "adhesive"])
   author      String
@@ -110,11 +110,11 @@ model BlogPost {
 }
 
 model SEOMetadata {
-  id              String   @id @default(uuid()) @db.VarChar(36)
+  id              String   @id @default(uuid())
   pageType        String   @map("page_type") // e.g. "PRODUCT", "CATEGORY", "MATERIAL", "USE_CASE", "ISSUE", "BLOG", "STATIC"
   pageId          String?  @map("page_id")   // ID of target resource, if applicable
   metaTitle       String   @map("meta_title")
-  metaDescription String   @db.Text @map("meta_description")
+  metaDescription String   @map("meta_description")
   canonicalUrl    String?  @map("canonical_url")
   createdAt       DateTime @default(now()) @map("created_at")
   updatedAt       DateTime @updatedAt @map("updated_at")
@@ -124,11 +124,11 @@ model SEOMetadata {
 }
 
 model Page {
-  id               String        @id @default(uuid()) @db.VarChar(36)
+  id               String        @id @default(uuid())
   title            String
   slug             String        @unique
-  description      String?       @db.Text
-  activeTemplateId String?       @map("active_template_id") @db.VarChar(36)
+  description      String?
+  activeTemplateId String?       @map("active_template_id")
   createdAt        DateTime      @default(now()) @map("created_at")
   updatedAt        DateTime      @updatedAt @map("updated_at")
 
@@ -139,7 +139,7 @@ model Page {
 }
 
 model PageTemplate {
-  id        String   @id @default(uuid()) @db.VarChar(36)
+  id        String   @id @default(uuid())
   name      String
   slug      String   @unique
   sections  Json     // Fully dynamic sections and blocks (headers, paragraphs, images, videos)

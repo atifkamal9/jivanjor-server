@@ -1,16 +1,8 @@
 import { PrismaClient } from '@prisma/client';
-import { PrismaMariaDb } from '@prisma/adapter-mariadb';
+import { PrismaPg } from '@prisma/adapter-pg';
 import { env } from './env';
-import { URL } from 'url';
 
-const parsedUrl = new URL(env.DATABASE_URL);
-const adapter = new PrismaMariaDb({
-  host: parsedUrl.hostname,
-  port: parsedUrl.port ? parseInt(parsedUrl.port, 10) : 3306,
-  user: decodeURIComponent(parsedUrl.username),
-  password: decodeURIComponent(parsedUrl.password),
-  database: decodeURIComponent(parsedUrl.pathname.substring(1)),
-});
+const adapter = new PrismaPg({ connectionString: env.DATABASE_URL });
 
 export const prisma = new PrismaClient({ adapter });
 
