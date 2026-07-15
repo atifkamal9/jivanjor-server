@@ -1,7 +1,6 @@
+import { z } from 'zod';
 import { prisma } from '../config/db';
 import { AppError, HttpCode } from '../utils/errors';
-import { slugify } from '../utils/slugify';
-import { z } from 'zod';
 import { createPageSchema, updatePageSchema } from '../utils/validation';
 
 type CreatePageInput = z.infer<typeof createPageSchema>['body'];
@@ -41,21 +40,21 @@ export class PageService {
    * Create a dynamic Page
    */
   static async create(input: CreatePageInput) {
-    const { title, description } = input;
-    const slug = slugify(title);
+    const { title, description, slug } = input;
+    const normalizedSlug = slug.trim().toLowerCase();
 
     // Validate slug uniqueness
     const existing = await prisma.page.findUnique({
-      where: { slug },
+      where: { slug: normalizedSlug },
     });
     if (existing) {
-      throw new AppError(`Page with slug '${slug}' already exists. Please choose a different title.`, HttpCode.CONFLICT);
+      throw new AppError(`Page with slug '${normalizedSlug}' already exists. Please choose a different slug.`, HttpCode.CONFLICT);
     }
 
     return prisma.page.create({
       data: {
         title,
-        slug,
+        slug: normalizedSlug,
         description,
       },
     });
@@ -65,7 +64,7 @@ export class PageService {
    * Update a Page
    */
   static async update(id: string, input: UpdatePageInput) {
-    const { title, description, activeTemplateId } = input;
+    const { title, description, activeTemplateId, slug } = input;
 
     // Verify page exists
     const page = await prisma.page.findUnique({
@@ -78,18 +77,23 @@ export class PageService {
     const dataToUpdate: any = {};
 
     if (title) {
-      const slug = slugify(title);
-      if (slug !== page.slug) {
+      dataToUpdate.title = title;
+    }
+
+    if (slug !== undefined) {
+      const normalizedSlug = slug.trim().toLowerCase();
+      if (normalizedSlug !== page.slug) {
+        // Prevent changing landing/home page slug
+        if (page.slug === 'home') {
+          throw new AppError("The home page slug is fixed to 'home' and cannot be modified.", HttpCode.BAD_REQUEST);
+        }
         const existing = await prisma.page.findUnique({
-          where: { slug },
+          where: { slug: normalizedSlug },
         });
         if (existing) {
-          throw new AppError(`Page with slug '${slug}' already exists.`, HttpCode.CONFLICT);
+          throw new AppError(`Page with slug '${normalizedSlug}' already exists.`, HttpCode.CONFLICT);
         }
-        dataToUpdate.title = title;
-        dataToUpdate.slug = slug;
-      } else {
-        dataToUpdate.title = title;
+        dataToUpdate.slug = normalizedSlug;
       }
     }
 

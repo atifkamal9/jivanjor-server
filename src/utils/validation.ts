@@ -171,6 +171,7 @@ export const createOrUpdateSEOSchema = z.object({
 export const createPageSchema = z.object({
   body: z.object({
     title: z.string().min(2, 'Title must be at least 2 characters'),
+    slug: z.string().min(1, 'Slug is required').regex(/^[a-z0-9-]+$/, 'Slug must be lowercase alphanumeric with hyphens only'),
     description: z.string().optional(),
   }),
 });
@@ -178,6 +179,7 @@ export const createPageSchema = z.object({
 export const updatePageSchema = z.object({
   body: z.object({
     title: z.string().min(2, 'Title must be at least 2 characters').optional(),
+    slug: z.string().min(1).regex(/^[a-z0-9-]+$/).optional(),
     description: z.string().optional(),
     activeTemplateId: z.string().uuid('Invalid template ID').nullable().optional(),
   }),
