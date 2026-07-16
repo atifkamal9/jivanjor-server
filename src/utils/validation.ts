@@ -158,10 +158,11 @@ export const updateBlogSchema = z.object({
 export const createOrUpdateSEOSchema = z.object({
   body: z.object({
     pageType: z.enum(['PRODUCT', 'CATEGORY', 'MATERIAL', 'USE_CASE', 'ISSUE', 'BLOG', 'STATIC']),
-    pageId: z.string().uuid('Invalid page ID').nullable().optional(),
+    pageId: z.string().nullable().optional(),
     metaTitle: z.string().min(2, 'Meta title must be at least 2 characters'),
     metaDescription: z.string().min(5, 'Meta description must be at least 5 characters'),
     canonicalUrl: z.string().url('Invalid canonical URL format').nullable().optional(),
+    image: z.string().nullable().optional(),
   }),
 });
 
