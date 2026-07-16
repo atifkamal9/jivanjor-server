@@ -29,6 +29,7 @@ export const createCategorySchema = z.object({
     name: z.string().min(2, 'Category name must be at least 2 characters'),
     parentId: z.string().uuid('Invalid parent category ID').nullable().optional(),
     description: z.string().optional(),
+    sections: z.union([z.record(z.any()), z.array(z.any())]).nullable().optional(),
   }),
 });
 
@@ -173,6 +174,7 @@ export const createPageSchema = z.object({
     title: z.string().min(2, 'Title must be at least 2 characters'),
     slug: z.string().min(1, 'Slug is required').regex(/^[a-z0-9-]+$/, 'Slug must be lowercase alphanumeric with hyphens only'),
     description: z.string().optional(),
+    sections: z.union([z.record(z.any()), z.array(z.any())]).nullable().optional(),
   }),
 });
 
@@ -182,6 +184,7 @@ export const updatePageSchema = z.object({
     slug: z.string().min(1).regex(/^[a-z0-9-]+$/).optional(),
     description: z.string().optional(),
     activeTemplateId: z.string().uuid('Invalid template ID').nullable().optional(),
+    sections: z.union([z.record(z.any()), z.array(z.any())]).nullable().optional(),
   }),
 });
 

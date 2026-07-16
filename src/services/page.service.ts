@@ -40,7 +40,7 @@ export class PageService {
    * Create a dynamic Page
    */
   static async create(input: CreatePageInput) {
-    const { title, description, slug } = input;
+    const { title, description, slug, sections } = input;
     const normalizedSlug = slug.trim().toLowerCase();
 
     // Validate slug uniqueness
@@ -56,6 +56,7 @@ export class PageService {
         title,
         slug: normalizedSlug,
         description,
+        sections: (sections as any) || undefined,
       },
     });
   }
@@ -64,7 +65,7 @@ export class PageService {
    * Update a Page
    */
   static async update(id: string, input: UpdatePageInput) {
-    const { title, description, activeTemplateId, slug } = input;
+    const { title, description, activeTemplateId, slug, sections } = input;
 
     // Verify page exists
     const page = await prisma.page.findUnique({
@@ -99,6 +100,10 @@ export class PageService {
 
     if (description !== undefined) {
       dataToUpdate.description = description;
+    }
+
+    if (sections !== undefined) {
+      dataToUpdate.sections = sections;
     }
 
     if (activeTemplateId !== undefined) {

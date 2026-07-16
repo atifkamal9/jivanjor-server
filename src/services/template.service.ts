@@ -54,7 +54,12 @@ export class TemplateService {
       throw new AppError(`No active template selected for page '${page.title}'`, HttpCode.NOT_FOUND);
     }
 
-    return page.activeTemplate;
+    const template = page.activeTemplate;
+    if (page.sections && typeof page.sections === 'object') {
+      template.sections = page.sections;
+    }
+
+    return template;
   }
 
   /**
