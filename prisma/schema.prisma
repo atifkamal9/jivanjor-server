@@ -118,6 +118,7 @@ model SEOMetadata {
   metaTitle       String   @map("meta_title")
   metaDescription String   @map("meta_description")
   canonicalUrl    String?  @map("canonical_url")
+  image           String?  @map("image")
   createdAt       DateTime @default(now()) @map("created_at")
   updatedAt       DateTime @updatedAt @map("updated_at")
 
@@ -131,6 +132,7 @@ model Page {
   slug             String        @unique
   description      String?
   activeTemplateId String?       @map("active_template_id")
+  sections         Json?         @map("sections")
   createdAt        DateTime      @default(now()) @map("created_at")
   updatedAt        DateTime      @updatedAt @map("updated_at")
 

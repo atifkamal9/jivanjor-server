@@ -32,7 +32,7 @@ export class SEOService {
    * Upsert (Create or Update) SEO Metadata
    */
   static async upsert(input: SEOInput) {
-    const { pageType, pageId, metaTitle, metaDescription, canonicalUrl } = input;
+    const { pageType, pageId, metaTitle, metaDescription, canonicalUrl, image } = input;
     const targetPageId = pageId || 'STATIC_PAGE'; // Standardize fallback to avoid true DB nulls in compound unique constraints
 
     // 1. Verify entity exists if it is not a STATIC type
@@ -77,6 +77,7 @@ export class SEOService {
         metaTitle,
         metaDescription,
         canonicalUrl: canonicalUrl || null,
+        image: image || null,
       },
       create: {
         pageType,
@@ -84,6 +85,7 @@ export class SEOService {
         metaTitle,
         metaDescription,
         canonicalUrl: canonicalUrl || null,
+        image: image || null,
       },
     });
   }

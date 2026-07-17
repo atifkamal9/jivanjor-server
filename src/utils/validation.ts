@@ -29,6 +29,7 @@ export const createCategorySchema = z.object({
     name: z.string().min(2, 'Category name must be at least 2 characters'),
     parentId: z.string().uuid('Invalid parent category ID').nullable().optional(),
     description: z.string().optional(),
+    sections: z.union([z.record(z.any()), z.array(z.any())]).nullable().optional(),
   }),
 });
 
@@ -157,10 +158,11 @@ export const updateBlogSchema = z.object({
 export const createOrUpdateSEOSchema = z.object({
   body: z.object({
     pageType: z.enum(['PRODUCT', 'CATEGORY', 'MATERIAL', 'USE_CASE', 'ISSUE', 'BLOG', 'STATIC']),
-    pageId: z.string().uuid('Invalid page ID').nullable().optional(),
+    pageId: z.string().nullable().optional(),
     metaTitle: z.string().min(2, 'Meta title must be at least 2 characters'),
     metaDescription: z.string().min(5, 'Meta description must be at least 5 characters'),
     canonicalUrl: z.string().url('Invalid canonical URL format').nullable().optional(),
+    image: z.string().nullable().optional(),
   }),
 });
 
@@ -171,15 +173,19 @@ export const createOrUpdateSEOSchema = z.object({
 export const createPageSchema = z.object({
   body: z.object({
     title: z.string().min(2, 'Title must be at least 2 characters'),
+    slug: z.string().min(1, 'Slug is required').regex(/^[a-z0-9-]+$/, 'Slug must be lowercase alphanumeric with hyphens only'),
     description: z.string().optional(),
+    sections: z.union([z.record(z.any()), z.array(z.any())]).nullable().optional(),
   }),
 });
 
 export const updatePageSchema = z.object({
   body: z.object({
     title: z.string().min(2, 'Title must be at least 2 characters').optional(),
+    slug: z.string().min(1).regex(/^[a-z0-9-]+$/).optional(),
     description: z.string().optional(),
     activeTemplateId: z.string().uuid('Invalid template ID').nullable().optional(),
+    sections: z.union([z.record(z.any()), z.array(z.any())]).nullable().optional(),
   }),
 });
 
