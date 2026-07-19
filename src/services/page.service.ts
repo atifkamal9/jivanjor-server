@@ -40,7 +40,7 @@ export class PageService {
    * Create a dynamic Page
    */
   static async create(input: CreatePageInput) {
-    const { title, description, slug, sections } = input;
+    const { title, description, slug, activeTemplateId, sections } = input;
     const normalizedSlug = slug.trim().toLowerCase();
 
     // Validate slug uniqueness
@@ -51,11 +51,21 @@ export class PageService {
       throw new AppError(`Page with slug '${normalizedSlug}' already exists. Please choose a different slug.`, HttpCode.CONFLICT);
     }
 
+    if (activeTemplateId) {
+      const template = await prisma.pageTemplate.findUnique({
+        where: { id: activeTemplateId },
+      });
+      if (!template) {
+        throw new AppError('Active template must exist in the templates pool', HttpCode.BAD_REQUEST);
+      }
+    }
+
     return prisma.page.create({
       data: {
         title,
         slug: normalizedSlug,
         description,
+        activeTemplateId: activeTemplateId || null,
         sections: (sections as any) || undefined,
       },
     });

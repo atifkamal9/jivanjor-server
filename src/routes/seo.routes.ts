@@ -14,5 +14,6 @@ router.use(protect, restrictTo('ADMIN'));
 
 router.post('/', validate(createOrUpdateSEOSchema), SEOController.upsert);
 router.delete('/', SEOController.delete);
+router.delete('/:id', SEOController.deleteById);
 
 export default router;
