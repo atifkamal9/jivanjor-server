@@ -175,6 +175,7 @@ export const createPageSchema = z.object({
     title: z.string().min(2, 'Title must be at least 2 characters'),
     slug: z.string().min(1, 'Slug is required').regex(/^[a-z0-9-]+$/, 'Slug must be lowercase alphanumeric with hyphens only'),
     description: z.string().optional(),
+    activeTemplateId: z.string().uuid('Invalid template ID').nullable().optional(),
     sections: z.union([z.record(z.any()), z.array(z.any())]).nullable().optional(),
   }),
 });

@@ -56,4 +56,28 @@ export class SEOController {
       message: 'SEO metadata successfully deleted',
     });
   });
+
+  /**
+   * Delete SEO metadata by unique ID
+   */
+  static deleteById = catchAsync(async (req: Request, res: Response) => {
+    const { id } = req.params;
+
+    const seo = await prisma.sEOMetadata.findUnique({
+      where: { id },
+    });
+
+    if (!seo) {
+      throw new AppError('SEO metadata not found', HttpCode.NOT_FOUND);
+    }
+
+    await prisma.sEOMetadata.delete({
+      where: { id },
+    });
+
+    return res.status(HttpCode.OK).json({
+      status: 'success',
+      message: 'SEO metadata successfully deleted by ID',
+    });
+  });
 }
