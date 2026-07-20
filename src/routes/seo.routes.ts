@@ -9,8 +9,8 @@ const router = Router();
 // Public routes
 router.get('/', SEOController.getOne);
 
-// Protected Admin-only routes
-router.use(protect, restrictTo('ADMIN'));
+// Protected Admin routes
+router.use(protect, restrictTo('ADMIN', 'SUPER_ADMIN'));
 
 router.post('/', validate(createOrUpdateSEOSchema), SEOController.upsert);
 router.delete('/', SEOController.delete);

@@ -29,6 +29,7 @@ export const createCategorySchema = z.object({
     name: z.string().min(2, 'Category name must be at least 2 characters'),
     parentId: z.string().uuid('Invalid parent category ID').nullable().optional(),
     description: z.string().optional(),
+    icon: z.string().optional().nullable(),
     sections: z.union([z.record(z.any()), z.array(z.any())]).nullable().optional(),
   }),
 });
@@ -38,6 +39,7 @@ export const updateCategorySchema = z.object({
     name: z.string().min(2, 'Category name must be at least 2 characters').optional(),
     parentId: z.string().uuid('Invalid parent category ID').nullable().optional(),
     description: z.string().optional(),
+    icon: z.string().optional().nullable(),
   }),
 });
 

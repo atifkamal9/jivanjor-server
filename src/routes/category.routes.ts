@@ -10,8 +10,8 @@ const router = Router();
 router.get('/', CategoryController.getAll);
 router.get('/:idOrSlug', CategoryController.getOne);
 
-// Protected Admin-only routes
-router.use(protect, restrictTo('ADMIN'));
+// Protected Admin routes
+router.use(protect, restrictTo('ADMIN', 'SUPER_ADMIN'));
 
 router.post('/', validate(createCategorySchema), CategoryController.create);
 router.put('/:id', validate(updateCategorySchema), CategoryController.update);

@@ -10,8 +10,8 @@ const router = Router();
 router.get('/:idOrSlug', PageController.getOne);
 router.get('/', PageController.getAll);
 
-// Protected Admin-only routes
-router.use(protect, restrictTo('ADMIN'));
+// Protected Admin routes
+router.use(protect, restrictTo('ADMIN', 'SUPER_ADMIN'));
 
 router.post('/', validate(createPageSchema), PageController.create);
 router.put('/:id', validate(updatePageSchema), PageController.update);

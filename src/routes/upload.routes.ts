@@ -4,8 +4,8 @@ import { protect, restrictTo } from '../middleware/auth';
 
 const router = Router();
 
-// All upload routes require authentication and ADMIN role
-router.use(protect, restrictTo('ADMIN'));
+// All upload routes require authentication and ADMIN or SUPER_ADMIN role
+router.use(protect, restrictTo('ADMIN', 'SUPER_ADMIN'));
 
 /**
  * POST /api/upload
