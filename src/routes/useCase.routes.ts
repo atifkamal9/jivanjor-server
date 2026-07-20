@@ -10,8 +10,8 @@ const router = Router();
 router.get('/', UseCaseController.getAll);
 router.get('/:idOrSlug', UseCaseController.getOne);
 
-// Protected Admin-only routes
-router.use(protect, restrictTo('ADMIN'));
+// Protected Admin routes
+router.use(protect, restrictTo('ADMIN', 'SUPER_ADMIN'));
 
 router.post('/', validate(createUseCaseSchema), UseCaseController.create);
 router.put('/:id', validate(updateUseCaseSchema), UseCaseController.update);
