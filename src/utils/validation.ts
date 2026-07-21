@@ -138,6 +138,7 @@ export const createBlogSchema = z.object({
     author: z.string().min(2, 'Author must be at least 2 characters'),
     publishDate: z.string().datetime('Invalid publish date format').optional(),
     image: z.string().url('Invalid image URL format').optional().nullable(),
+    tldr: z.string().optional().nullable(),
   }),
 });
 
@@ -150,6 +151,7 @@ export const updateBlogSchema = z.object({
     author: z.string().min(2, 'Author must be at least 2 characters').optional(),
     publishDate: z.string().datetime('Invalid publish date format').optional(),
     image: z.string().url('Invalid image URL format').optional().nullable(),
+    tldr: z.string().optional().nullable(),
   }),
 });
 
