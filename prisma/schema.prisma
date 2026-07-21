@@ -107,6 +107,7 @@ model BlogPost {
   author      String
   publishDate DateTime @default(now()) @map("publish_date")
   image       String?
+  tldr        String?  // Summary description
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
