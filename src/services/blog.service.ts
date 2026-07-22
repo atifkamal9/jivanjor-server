@@ -107,6 +107,8 @@ export class BlogService {
    */
   static async create(input: CreateBlogInput) {
     const { title, content, category, tags, author, publishDate, image, tldr } = input;
+    const authorDescription = input.authorDescription || input.author_description || null;
+    const authorAvatar = input.authorAvatar || input.author_avatar || null;
     const slug = slugify(title);
 
     // Validate slug uniqueness
@@ -125,6 +127,8 @@ export class BlogService {
         category,
         tags: tags ? JSON.parse(JSON.stringify(tags)) : null,
         author,
+        authorDescription,
+        authorAvatar,
         publishDate: publishDate ? new Date(publishDate) : new Date(),
         image,
         tldr,
@@ -137,6 +141,8 @@ export class BlogService {
    */
   static async update(id: string, input: UpdateBlogInput) {
     const { title, content, category, tags, author, publishDate, image, tldr } = input;
+    const authorDescription = input.authorDescription !== undefined ? input.authorDescription : input.author_description;
+    const authorAvatar = input.authorAvatar !== undefined ? input.authorAvatar : input.author_avatar;
 
     // Verify blog exists
     const blog = await prisma.blogPost.findUnique({
@@ -178,6 +184,14 @@ export class BlogService {
 
     if (author) {
       dataToUpdate.author = author;
+    }
+
+    if (authorDescription !== undefined) {
+      dataToUpdate.authorDescription = authorDescription;
+    }
+
+    if (authorAvatar !== undefined) {
+      dataToUpdate.authorAvatar = authorAvatar;
     }
 
     if (publishDate) {

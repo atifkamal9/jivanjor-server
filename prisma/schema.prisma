@@ -105,6 +105,8 @@ model BlogPost {
   category    String   // Tag/category group name
   tags        Json?    // Array of tags (e.g. ["plumbing", "adhesive"])
   author      String
+  authorDescription String? @map("author_description")
+  authorAvatar      String? @map("author_avatar")
   publishDate DateTime @default(now()) @map("publish_date")
   image       String?
   tldr        String?  // Summary description
