@@ -18,6 +18,24 @@ const ALLOWED_MIME_TYPES: Record<string, string> = {
   'video/mp4': '.mp4',
   'video/webm': '.webm',
   'video/quicktime': '.mov',
+  // Documents & Technical Resources
+  'application/pdf': '.pdf',
+  'application/msword': '.doc',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': '.docx',
+  'application/vnd.ms-excel': '.xls',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': '.xlsx',
+  'application/vnd.ms-powerpoint': '.ppt',
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation': '.pptx',
+  'text/plain': '.txt',
+  'text/csv': '.csv',
+  // Archives
+  'application/zip': '.zip',
+  'application/x-zip-compressed': '.zip',
+  'application/x-rar-compressed': '.rar',
+  'application/vnd.rar': '.rar',
+  'application/x-7z-compressed': '.7z',
+  'application/x-tar': '.tar',
+  'application/gzip': '.gz',
 };
 
 export interface UploadResult {
@@ -52,11 +70,26 @@ export class UploadService {
       );
     }
 
-    // 2. Validate MIME type
-    const extension = ALLOWED_MIME_TYPES[mimeType];
+    // 2. Validate MIME type & Extension
+    let extension = ALLOWED_MIME_TYPES[mimeType];
+
+    if (!extension) {
+      // Fallback extension check from original filename for unusual browser MIME types
+      const fileExt = path.extname(originalName).toLowerCase();
+      const allowedExtensions = [
+        '.jpg', '.jpeg', '.png', '.webp', '.gif', '.svg',
+        '.mp4', '.webm', '.mov',
+        '.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx', '.txt', '.csv',
+        '.zip', '.rar', '.7z', '.tar', '.gz'
+      ];
+      if (allowedExtensions.includes(fileExt)) {
+        extension = fileExt;
+      }
+    }
+
     if (!extension) {
       throw new AppError(
-        `Unsupported file type: ${mimeType}. Allowed types: images (jpg, png, webp, gif, svg) and videos (mp4, webm, mov).`,
+        `Unsupported file type: ${mimeType}. Allowed types: images, videos, PDF, Office documents (DOC, DOCX, XLS, XLSX, PPT, PPTX), text, CSV, and archives (ZIP, RAR, 7Z).`,
         HttpCode.BAD_REQUEST,
       );
     }
