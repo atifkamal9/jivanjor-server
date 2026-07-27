@@ -160,3 +160,15 @@ model PageTemplate {
 
   @@map("page_templates")
 }
+
+model Menu {
+  id             String   @id @default("header_menu")
+  name           String   @default("Main Header Navigation")
+  draftItems     Json     @map("draft_items")
+  publishedItems Json     @map("published_items")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  @@map("menus")
+}
+
