@@ -103,4 +103,38 @@ export class AuthService {
 
     return user;
   }
+
+  /**
+   * Change user password
+   */
+  static async changePassword(userId: string, input: { currentPassword?: string; newPassword?: string }) {
+    const { currentPassword, newPassword } = input;
+    if (!newPassword || newPassword.length < 6) {
+      throw new AppError('New password must be at least 6 characters long', HttpCode.BAD_REQUEST);
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new AppError('User not found', HttpCode.NOT_FOUND);
+    }
+
+    if (currentPassword) {
+      const isMatch = await bcrypt.compare(currentPassword, user.password);
+      if (!isMatch) {
+        throw new AppError('Current password is incorrect', HttpCode.BAD_REQUEST);
+      }
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 12);
+
+    await prisma.user.update({
+      where: { id: userId },
+      data: { password: hashedPassword },
+    });
+
+    return { message: 'Password updated successfully' };
+  }
 }
