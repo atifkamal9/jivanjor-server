@@ -10,11 +10,17 @@ export const DEFAULT_SETTINGS = {
     linkedin: 'https://linkedin.com',
     twitter: 'https://x.com',
   },
+  rightChoiceBanner: {
+    title: 'Need Help Choosing the Right Adhesive?',
+    subtitle: 'Share your woodwork needs, product query or application concerns. Our team will help you find the right Jivanjor solution.',
+    ctaText: 'Submit Your Query',
+    ctaLink: '/contact',
+  },
 };
 
 export class SettingService {
   /**
-   * Get site settings (logos, social media links)
+   * Get site settings (logos, social media links, right choice banner)
    */
   static async getSettings() {
     let settings = await (prisma as any).siteSetting.findUnique({
@@ -28,6 +34,7 @@ export class SettingService {
           desktopLogo: DEFAULT_SETTINGS.desktopLogo,
           mobileLogo: DEFAULT_SETTINGS.mobileLogo,
           socialLinks: DEFAULT_SETTINGS.socialLinks,
+          rightChoiceBanner: DEFAULT_SETTINGS.rightChoiceBanner,
         },
       });
     }
@@ -35,6 +42,10 @@ export class SettingService {
     const socialLinks = typeof settings.socialLinks === 'string'
       ? JSON.parse(settings.socialLinks)
       : (settings.socialLinks || DEFAULT_SETTINGS.socialLinks);
+
+    const rightChoiceBanner = typeof settings.rightChoiceBanner === 'string'
+      ? JSON.parse(settings.rightChoiceBanner)
+      : (settings.rightChoiceBanner || DEFAULT_SETTINGS.rightChoiceBanner);
 
     return {
       id: settings.id,
@@ -46,6 +57,12 @@ export class SettingService {
         youtube: socialLinks?.youtube || DEFAULT_SETTINGS.socialLinks.youtube,
         linkedin: socialLinks?.linkedin || DEFAULT_SETTINGS.socialLinks.linkedin,
         twitter: socialLinks?.twitter || DEFAULT_SETTINGS.socialLinks.twitter,
+      },
+      rightChoiceBanner: {
+        title: rightChoiceBanner?.title ?? DEFAULT_SETTINGS.rightChoiceBanner.title,
+        subtitle: rightChoiceBanner?.subtitle ?? DEFAULT_SETTINGS.rightChoiceBanner.subtitle,
+        ctaText: rightChoiceBanner?.ctaText ?? DEFAULT_SETTINGS.rightChoiceBanner.ctaText,
+        ctaLink: rightChoiceBanner?.ctaLink ?? DEFAULT_SETTINGS.rightChoiceBanner.ctaLink,
       },
       updatedAt: settings.updatedAt,
     };
@@ -58,6 +75,7 @@ export class SettingService {
     desktopLogo?: string;
     mobileLogo?: string;
     socialLinks?: Record<string, string>;
+    rightChoiceBanner?: Record<string, string>;
   }) {
     const current = await this.getSettings();
 
@@ -67,6 +85,10 @@ export class SettingService {
       ...current.socialLinks,
       ...(data.socialLinks || {}),
     };
+    const newRightChoiceBanner = {
+      ...current.rightChoiceBanner,
+      ...(data.rightChoiceBanner || {}),
+    };
 
     const settings = await (prisma as any).siteSetting.upsert({
       where: { id: 'site_settings' },
@@ -75,17 +97,23 @@ export class SettingService {
         desktopLogo: newDesktopLogo,
         mobileLogo: newMobileLogo,
         socialLinks: newSocialLinks,
+        rightChoiceBanner: newRightChoiceBanner,
       },
       update: {
         desktopLogo: newDesktopLogo,
         mobileLogo: newMobileLogo,
         socialLinks: newSocialLinks,
+        rightChoiceBanner: newRightChoiceBanner,
       },
     });
 
     const socialLinks = typeof settings.socialLinks === 'string'
       ? JSON.parse(settings.socialLinks)
       : (settings.socialLinks || DEFAULT_SETTINGS.socialLinks);
+
+    const rightChoiceBanner = typeof settings.rightChoiceBanner === 'string'
+      ? JSON.parse(settings.rightChoiceBanner)
+      : (settings.rightChoiceBanner || DEFAULT_SETTINGS.rightChoiceBanner);
 
     return {
       id: settings.id,
@@ -98,7 +126,14 @@ export class SettingService {
         linkedin: socialLinks?.linkedin || DEFAULT_SETTINGS.socialLinks.linkedin,
         twitter: socialLinks?.twitter || DEFAULT_SETTINGS.socialLinks.twitter,
       },
+      rightChoiceBanner: {
+        title: rightChoiceBanner?.title ?? DEFAULT_SETTINGS.rightChoiceBanner.title,
+        subtitle: rightChoiceBanner?.subtitle ?? DEFAULT_SETTINGS.rightChoiceBanner.subtitle,
+        ctaText: rightChoiceBanner?.ctaText ?? DEFAULT_SETTINGS.rightChoiceBanner.ctaText,
+        ctaLink: rightChoiceBanner?.ctaLink ?? DEFAULT_SETTINGS.rightChoiceBanner.ctaLink,
+      },
       updatedAt: settings.updatedAt,
     };
   }
 }
+

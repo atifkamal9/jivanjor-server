@@ -4,6 +4,7 @@ import { env } from './env';
 
 const adapter = new PrismaPg({ connectionString: env.DATABASE_URL });
 
+// Database connection initialized with Prisma Client and PostgreSQL adapter
 export const prisma = new PrismaClient({ adapter });
 
 // Graceful shutdown
