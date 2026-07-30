@@ -16,6 +16,7 @@ import templateRouter from './routes/template.routes';
 import pageRouter from './routes/page.routes';
 import uploadRouter from './routes/upload.routes';
 import menuRouter from './routes/menu.routes';
+import settingRouter from './routes/setting.routes';
 
 const app = express();
 
@@ -46,6 +47,8 @@ app.use('/api/templates', templateRouter);
 app.use('/api/pages', pageRouter);
 app.use('/api/upload', uploadRouter);
 app.use('/api/menus', menuRouter);
+app.use('/api/settings', settingRouter);
+
 
 
 // Fallback for unhandled routes
