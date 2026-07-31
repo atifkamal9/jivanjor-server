@@ -61,6 +61,7 @@ model Product {
   slug        String   @unique
   description String
   categoryId  String   @map("category_id")
+  categoryIds String[] @default([]) @map("category_ids")
   materialId  String?  @map("material_id")
   image       String?
   metadata    Json?    // Custom dynamic attributes
@@ -176,6 +177,8 @@ model SiteSetting {
   id                String   @id @default("site_settings")
   desktopLogo       String?  @map("desktop_logo")
   mobileLogo        String?  @map("mobile_logo")
+  categoryHeroCover String?  @map("category_hero_cover")
+  categoryCardBg    String?  @map("category_card_bg")
   socialLinks       Json?    @map("social_links")
   rightChoiceBanner Json?    @map("right_choice_banner")
   createdAt         DateTime @default(now()) @map("created_at")

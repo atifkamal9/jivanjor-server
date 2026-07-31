@@ -68,22 +68,26 @@ export const updateMaterialSchema = z.object({
 export const createProductSchema = z.object({
   body: z.object({
     name: z.string().min(2, 'Product name must be at least 2 characters'),
-    description: z.string().min(5, 'Description must be at least 5 characters'),
-    categoryId: z.string().uuid('Invalid category ID'),
-    materialId: z.string().uuid('Invalid material ID').nullable().optional(),
-    metadata: z.record(z.any()).optional(), // JSON object for dynamic specs
-    image: z.string().url('Invalid image URL format').optional().nullable(),
+    description: z.string().min(1, 'Description is required'),
+    categoryId: z.string().min(1, 'Category ID is required'),
+    categoryIds: z.array(z.string()).optional(),
+    category_ids: z.array(z.string()).optional(),
+    materialId: z.string().nullable().optional(),
+    metadata: z.record(z.any()).optional(),
+    image: z.string().nullable().optional(),
   }),
 });
 
 export const updateProductSchema = z.object({
   body: z.object({
     name: z.string().min(2, 'Product name must be at least 2 characters').optional(),
-    description: z.string().min(5, 'Description must be at least 5 characters').optional(),
-    categoryId: z.string().uuid('Invalid category ID').optional(),
-    materialId: z.string().uuid('Invalid material ID').nullable().optional(),
+    description: z.string().optional(),
+    categoryId: z.string().optional(),
+    categoryIds: z.array(z.string()).optional(),
+    category_ids: z.array(z.string()).optional(),
+    materialId: z.string().nullable().optional(),
     metadata: z.record(z.any()).optional(),
-    image: z.string().url('Invalid image URL format').optional().nullable(),
+    image: z.string().nullable().optional(),
   }),
 });
 

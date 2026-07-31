@@ -30,7 +30,10 @@ export class ProductService {
     const whereClause: any = {};
 
     if (categoryId) {
-      whereClause.categoryId = categoryId;
+      whereClause.OR = [
+        { categoryId: categoryId },
+        { categoryIds: { has: categoryId } },
+      ];
     }
 
     if (materialId) {
@@ -38,10 +41,19 @@ export class ProductService {
     }
 
     if (search) {
-      whereClause.OR = [
-        { name: { contains: search } },
-        { description: { contains: search } },
+      const searchOR = [
+        { name: { contains: search, mode: 'insensitive' } },
+        { description: { contains: search, mode: 'insensitive' } },
       ];
+      if (whereClause.OR) {
+        whereClause.AND = [
+          { OR: whereClause.OR },
+          { OR: searchOR }
+        ];
+        delete whereClause.OR;
+      } else {
+        whereClause.OR = searchOR;
+      }
     }
 
     // Run parallel queries for pagination metadata and results
@@ -113,6 +125,10 @@ export class ProductService {
    */
   static async create(input: CreateProductInput) {
     const { name, description, categoryId, materialId, metadata, image } = input;
+    const rawCategoryIds: string[] = (input as any).categoryIds || (input as any).category_ids || [];
+    const finalCategoryIds = rawCategoryIds.length > 0
+      ? Array.from(new Set(rawCategoryIds)).filter(Boolean)
+      : [categoryId].filter(Boolean);
     const slug = slugify(name);
 
     // 1. Check slug uniqueness
@@ -148,6 +164,7 @@ export class ProductService {
         slug,
         description,
         categoryId,
+        categoryIds: finalCategoryIds,
         materialId,
         metadata: metadata,
         image,
@@ -160,6 +177,7 @@ export class ProductService {
    */
   static async update(id: string, input: UpdateProductInput) {
     const { name, description, categoryId, materialId, metadata, image } = input;
+    const rawCategoryIds: string[] = (input as any).categoryIds || (input as any).category_ids;
 
     // 1. Verify product exists
     const product = await prisma.product.findUnique({
@@ -180,6 +198,12 @@ export class ProductService {
         throw new AppError('Category not found', HttpCode.NOT_FOUND);
       }
       dataToUpdate.categoryId = categoryId;
+    }
+
+    if (rawCategoryIds !== undefined) {
+      dataToUpdate.categoryIds = Array.from(new Set(rawCategoryIds)).filter(Boolean);
+    } else if (categoryId) {
+      dataToUpdate.categoryIds = Array.from(new Set([categoryId, ...product.categoryIds])).filter(Boolean);
     }
 
     // 3. Validate new material
