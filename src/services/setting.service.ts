@@ -3,6 +3,8 @@ import { prisma } from '../config/db';
 export const DEFAULT_SETTINGS = {
   desktopLogo: '/images/logo.png',
   mobileLogo: '/images/logo.png',
+  categoryHeroCover: '/images/main-category-hero.png',
+  categoryCardBg: '/images/placeholder.png',
   socialLinks: {
     facebook: 'https://facebook.com',
     instagram: 'https://instagram.com',
@@ -20,7 +22,7 @@ export const DEFAULT_SETTINGS = {
 
 export class SettingService {
   /**
-   * Get site settings (logos, social media links, right choice banner)
+   * Get site settings (logos, category covers/backgrounds, social media links, right choice banner)
    */
   static async getSettings() {
     let settings = await (prisma as any).siteSetting.findUnique({
@@ -33,6 +35,8 @@ export class SettingService {
           id: 'site_settings',
           desktopLogo: DEFAULT_SETTINGS.desktopLogo,
           mobileLogo: DEFAULT_SETTINGS.mobileLogo,
+          categoryHeroCover: DEFAULT_SETTINGS.categoryHeroCover,
+          categoryCardBg: DEFAULT_SETTINGS.categoryCardBg,
           socialLinks: DEFAULT_SETTINGS.socialLinks,
           rightChoiceBanner: DEFAULT_SETTINGS.rightChoiceBanner,
         },
@@ -51,6 +55,8 @@ export class SettingService {
       id: settings.id,
       desktopLogo: settings.desktopLogo || DEFAULT_SETTINGS.desktopLogo,
       mobileLogo: settings.mobileLogo || settings.desktopLogo || DEFAULT_SETTINGS.mobileLogo,
+      categoryHeroCover: settings.categoryHeroCover || DEFAULT_SETTINGS.categoryHeroCover,
+      categoryCardBg: settings.categoryCardBg || DEFAULT_SETTINGS.categoryCardBg,
       socialLinks: {
         facebook: socialLinks?.facebook || DEFAULT_SETTINGS.socialLinks.facebook,
         instagram: socialLinks?.instagram || DEFAULT_SETTINGS.socialLinks.instagram,
@@ -74,6 +80,8 @@ export class SettingService {
   static async updateSettings(data: {
     desktopLogo?: string;
     mobileLogo?: string;
+    categoryHeroCover?: string;
+    categoryCardBg?: string;
     socialLinks?: Record<string, string>;
     rightChoiceBanner?: Record<string, string>;
   }) {
@@ -81,6 +89,8 @@ export class SettingService {
 
     const newDesktopLogo = data.desktopLogo !== undefined ? data.desktopLogo : current.desktopLogo;
     const newMobileLogo = data.mobileLogo !== undefined ? data.mobileLogo : current.mobileLogo;
+    const newCategoryHeroCover = data.categoryHeroCover !== undefined ? data.categoryHeroCover : current.categoryHeroCover;
+    const newCategoryCardBg = data.categoryCardBg !== undefined ? data.categoryCardBg : current.categoryCardBg;
     const newSocialLinks = {
       ...current.socialLinks,
       ...(data.socialLinks || {}),
@@ -96,12 +106,16 @@ export class SettingService {
         id: 'site_settings',
         desktopLogo: newDesktopLogo,
         mobileLogo: newMobileLogo,
+        categoryHeroCover: newCategoryHeroCover,
+        categoryCardBg: newCategoryCardBg,
         socialLinks: newSocialLinks,
         rightChoiceBanner: newRightChoiceBanner,
       },
       update: {
         desktopLogo: newDesktopLogo,
         mobileLogo: newMobileLogo,
+        categoryHeroCover: newCategoryHeroCover,
+        categoryCardBg: newCategoryCardBg,
         socialLinks: newSocialLinks,
         rightChoiceBanner: newRightChoiceBanner,
       },
@@ -119,6 +133,8 @@ export class SettingService {
       id: settings.id,
       desktopLogo: settings.desktopLogo || DEFAULT_SETTINGS.desktopLogo,
       mobileLogo: settings.mobileLogo || settings.desktopLogo || DEFAULT_SETTINGS.mobileLogo,
+      categoryHeroCover: settings.categoryHeroCover || DEFAULT_SETTINGS.categoryHeroCover,
+      categoryCardBg: settings.categoryCardBg || DEFAULT_SETTINGS.categoryCardBg,
       socialLinks: {
         facebook: socialLinks?.facebook || DEFAULT_SETTINGS.socialLinks.facebook,
         instagram: socialLinks?.instagram || DEFAULT_SETTINGS.socialLinks.instagram,

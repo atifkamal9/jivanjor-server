@@ -177,6 +177,8 @@ model SiteSetting {
   id                String   @id @default("site_settings")
   desktopLogo       String?  @map("desktop_logo")
   mobileLogo        String?  @map("mobile_logo")
+  categoryHeroCover String?  @map("category_hero_cover")
+  categoryCardBg    String?  @map("category_card_bg")
   socialLinks       Json?    @map("social_links")
   rightChoiceBanner Json?    @map("right_choice_banner")
   createdAt         DateTime @default(now()) @map("created_at")
