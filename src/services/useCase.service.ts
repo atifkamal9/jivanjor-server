@@ -1,11 +1,7 @@
 import { prisma } from '../config/db';
 import { AppError, HttpCode } from '../utils/errors';
 import { slugify } from '../utils/slugify';
-import { z } from 'zod';
-import { createUseCaseSchema, updateUseCaseSchema } from '../utils/validation';
 
-type CreateUseCaseInput = z.infer<typeof createUseCaseSchema>['body'];
-type UpdateUseCaseInput = z.infer<typeof updateUseCaseSchema>['body'];
 
 export class UseCaseService {
   /**
@@ -50,8 +46,8 @@ export class UseCaseService {
   /**
    * Create use case
    */
-  static async create(input: CreateUseCaseInput) {
-    const { title, description } = input;
+  static async create(input: any) {
+    const { title, description, content, category, image } = input;
     const slug = slugify(title);
 
     // Validate slug uniqueness
@@ -67,6 +63,9 @@ export class UseCaseService {
         title,
         slug,
         description,
+        content: content || null,
+        category: category || null,
+        image: image || null,
       },
     });
   }
@@ -74,8 +73,8 @@ export class UseCaseService {
   /**
    * Update use case
    */
-  static async update(id: string, input: UpdateUseCaseInput) {
-    const { title, description } = input;
+  static async update(id: string, input: any) {
+    const { title, description, content, category, image } = input;
 
     // Verify use case exists
     const useCase = await prisma.useCase.findUnique({
@@ -103,8 +102,17 @@ export class UseCaseService {
       }
     }
 
-    if (description) {
+    if (description !== undefined) {
       dataToUpdate.description = description;
+    }
+    if (content !== undefined) {
+      dataToUpdate.content = content;
+    }
+    if (category !== undefined) {
+      dataToUpdate.category = category;
+    }
+    if (image !== undefined) {
+      dataToUpdate.image = image;
     }
 
     return prisma.useCase.update({

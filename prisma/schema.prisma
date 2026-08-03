@@ -80,6 +80,9 @@ model UseCase {
   title       String
   slug        String   @unique
   description String
+  content     String?
+  category    String?
+  image       String?
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
