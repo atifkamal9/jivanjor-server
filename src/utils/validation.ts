@@ -69,6 +69,8 @@ export const createProductSchema = z.object({
   body: z.object({
     name: z.string().min(2, 'Product name must be at least 2 characters'),
     description: z.string().min(1, 'Description is required'),
+    shortDescription: z.string().nullable().optional(),
+    short_description: z.string().nullable().optional(),
     categoryId: z.string().min(1, 'Category ID is required'),
     categoryIds: z.array(z.string()).optional(),
     category_ids: z.array(z.string()).optional(),
@@ -82,6 +84,8 @@ export const updateProductSchema = z.object({
   body: z.object({
     name: z.string().min(2, 'Product name must be at least 2 characters').optional(),
     description: z.string().optional(),
+    shortDescription: z.string().nullable().optional(),
+    short_description: z.string().nullable().optional(),
     categoryId: z.string().optional(),
     categoryIds: z.array(z.string()).optional(),
     category_ids: z.array(z.string()).optional(),

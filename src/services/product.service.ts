@@ -158,11 +158,14 @@ export class ProductService {
     }
 
     // 4. Create product
+    const shortDescription = (input as any).shortDescription || (input as any).short_description || null;
+
     return prisma.product.create({
       data: {
         name,
         slug,
         description,
+        shortDescription,
         categoryId,
         categoryIds: finalCategoryIds,
         materialId,
@@ -238,6 +241,11 @@ export class ProductService {
 
     if (description) {
       dataToUpdate.description = description;
+    }
+
+    const shortDescription = (input as any).shortDescription !== undefined ? (input as any).shortDescription : (input as any).short_description;
+    if (shortDescription !== undefined) {
+      dataToUpdate.shortDescription = shortDescription || null;
     }
 
     if (metadata !== undefined) {
