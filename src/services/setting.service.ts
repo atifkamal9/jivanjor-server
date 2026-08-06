@@ -18,11 +18,34 @@ export const DEFAULT_SETTINGS = {
     ctaText: 'Submit Your Query',
     ctaLink: '/contact',
   },
+  contactPage: {
+    heroImage: '/images/image 24.png',
+    heroTitle: 'Contact Us',
+    mainHeading: 'We are always happy to assist you.',
+    watermarkImage: '/images/watermark-contact.svg',
+    sections: [
+      {
+        title: 'Customer Support',
+        details: [
+          { label: 'Phone', value: '1800-XXX-XXX', icon: '/images/Phone-call.svg' },
+          { label: 'Email', value: 'support@jivanjor.com', icon: '/images/Mail-one.svg' },
+          { label: 'Hours', value: 'Mon-Sat, 9:00 AM – 6:00 PM', icon: '/images/Alarm-clock.svg' },
+        ],
+      },
+      {
+        title: 'Corporate Headquarters',
+        details: [
+          { label: 'Address', value: '1234, Address Street', icon: '/images/Pin.svg' },
+          { label: 'Hours', value: 'Mon-Sat, 9:00 AM – 6:00 PM', icon: '/images/Alarm-clock.svg' },
+        ],
+      },
+    ],
+  },
 };
 
 export class SettingService {
   /**
-   * Get site settings (logos, category covers/backgrounds, social media links, right choice banner)
+   * Get site settings (logos, category covers/backgrounds, social media links, right choice banner, contact page)
    */
   static async getSettings() {
     let settings = await (prisma as any).siteSetting.findUnique({
@@ -39,6 +62,7 @@ export class SettingService {
           categoryCardBg: DEFAULT_SETTINGS.categoryCardBg,
           socialLinks: DEFAULT_SETTINGS.socialLinks,
           rightChoiceBanner: DEFAULT_SETTINGS.rightChoiceBanner,
+          contactPage: DEFAULT_SETTINGS.contactPage,
         },
       });
     }
@@ -50,6 +74,10 @@ export class SettingService {
     const rightChoiceBanner = typeof settings.rightChoiceBanner === 'string'
       ? JSON.parse(settings.rightChoiceBanner)
       : (settings.rightChoiceBanner || DEFAULT_SETTINGS.rightChoiceBanner);
+
+    const contactPage = typeof settings.contactPage === 'string'
+      ? JSON.parse(settings.contactPage)
+      : (settings.contactPage || DEFAULT_SETTINGS.contactPage);
 
     return {
       id: settings.id,
@@ -69,6 +97,13 @@ export class SettingService {
         subtitle: rightChoiceBanner?.subtitle ?? DEFAULT_SETTINGS.rightChoiceBanner.subtitle,
         ctaText: rightChoiceBanner?.ctaText ?? DEFAULT_SETTINGS.rightChoiceBanner.ctaText,
         ctaLink: rightChoiceBanner?.ctaLink ?? DEFAULT_SETTINGS.rightChoiceBanner.ctaLink,
+      },
+      contactPage: {
+        heroImage: contactPage?.heroImage || DEFAULT_SETTINGS.contactPage.heroImage,
+        heroTitle: contactPage?.heroTitle || DEFAULT_SETTINGS.contactPage.heroTitle,
+        mainHeading: contactPage?.mainHeading || DEFAULT_SETTINGS.contactPage.mainHeading,
+        watermarkImage: contactPage?.watermarkImage || DEFAULT_SETTINGS.contactPage.watermarkImage,
+        sections: Array.isArray(contactPage?.sections) ? contactPage.sections : DEFAULT_SETTINGS.contactPage.sections,
       },
       updatedAt: settings.updatedAt,
     };
@@ -84,6 +119,7 @@ export class SettingService {
     categoryCardBg?: string;
     socialLinks?: Record<string, string>;
     rightChoiceBanner?: Record<string, string>;
+    contactPage?: any;
   }) {
     const current = await this.getSettings();
 
@@ -99,6 +135,7 @@ export class SettingService {
       ...current.rightChoiceBanner,
       ...(data.rightChoiceBanner || {}),
     };
+    const newContactPage = data.contactPage !== undefined ? data.contactPage : current.contactPage;
 
     const settings = await (prisma as any).siteSetting.upsert({
       where: { id: 'site_settings' },
@@ -110,6 +147,7 @@ export class SettingService {
         categoryCardBg: newCategoryCardBg,
         socialLinks: newSocialLinks,
         rightChoiceBanner: newRightChoiceBanner,
+        contactPage: newContactPage,
       },
       update: {
         desktopLogo: newDesktopLogo,
@@ -118,6 +156,7 @@ export class SettingService {
         categoryCardBg: newCategoryCardBg,
         socialLinks: newSocialLinks,
         rightChoiceBanner: newRightChoiceBanner,
+        contactPage: newContactPage,
       },
     });
 
@@ -128,6 +167,10 @@ export class SettingService {
     const rightChoiceBanner = typeof settings.rightChoiceBanner === 'string'
       ? JSON.parse(settings.rightChoiceBanner)
       : (settings.rightChoiceBanner || DEFAULT_SETTINGS.rightChoiceBanner);
+
+    const contactPage = typeof settings.contactPage === 'string'
+      ? JSON.parse(settings.contactPage)
+      : (settings.contactPage || DEFAULT_SETTINGS.contactPage);
 
     return {
       id: settings.id,
@@ -147,6 +190,13 @@ export class SettingService {
         subtitle: rightChoiceBanner?.subtitle ?? DEFAULT_SETTINGS.rightChoiceBanner.subtitle,
         ctaText: rightChoiceBanner?.ctaText ?? DEFAULT_SETTINGS.rightChoiceBanner.ctaText,
         ctaLink: rightChoiceBanner?.ctaLink ?? DEFAULT_SETTINGS.rightChoiceBanner.ctaLink,
+      },
+      contactPage: {
+        heroImage: contactPage?.heroImage || DEFAULT_SETTINGS.contactPage.heroImage,
+        heroTitle: contactPage?.heroTitle || DEFAULT_SETTINGS.contactPage.heroTitle,
+        mainHeading: contactPage?.mainHeading || DEFAULT_SETTINGS.contactPage.mainHeading,
+        watermarkImage: contactPage?.watermarkImage || DEFAULT_SETTINGS.contactPage.watermarkImage,
+        sections: Array.isArray(contactPage?.sections) ? contactPage.sections : DEFAULT_SETTINGS.contactPage.sections,
       },
       updatedAt: settings.updatedAt,
     };

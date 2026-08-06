@@ -185,6 +185,7 @@ model SiteSetting {
   categoryCardBg    String?  @map("category_card_bg")
   socialLinks       Json?    @map("social_links")
   rightChoiceBanner Json?    @map("right_choice_banner")
+  contactPage       Json?    @map("contact_page")
   createdAt         DateTime @default(now()) @map("created_at")
   updatedAt         DateTime @updatedAt @map("updated_at")
 
