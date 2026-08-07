@@ -70,7 +70,7 @@ export class CategoryService {
    * Create a new category
    */
   static async create(input: CreateCategoryInput) {
-    const { name, parentId, description, icon } = input as any;
+    const { name, parentId, description, tagline, icon } = input as any;
     const slug = slugify(name);
 
     // Check slug uniqueness
@@ -97,6 +97,7 @@ export class CategoryService {
         slug,
         parentId,
         description,
+        tagline: tagline || null,
         icon: icon || null,
       },
     });
@@ -106,7 +107,7 @@ export class CategoryService {
    * Update category
    */
   static async update(id: string, input: UpdateCategoryInput) {
-    const { name, parentId, description, icon } = input as any;
+    const { name, parentId, description, tagline, icon } = input as any;
 
     // 1. Verify category exists
     const category = await prisma.productCategory.findUnique({
@@ -154,6 +155,10 @@ export class CategoryService {
 
     if (description !== undefined) {
       dataToUpdate.description = description;
+    }
+
+    if (tagline !== undefined) {
+      dataToUpdate.tagline = tagline || null;
     }
 
     // 4. Handle icon update
