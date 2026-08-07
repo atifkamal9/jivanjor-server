@@ -30,6 +30,7 @@ model ProductCategory {
   slug        String            @unique
   parentId    String?           @map("parent_id")
   description String?
+  tagline     String?
   icon        String?           // Pre-stored platform icon key (e.g. Lucide icon name)
   createdAt   DateTime          @default(now()) @map("created_at")
   updatedAt   DateTime          @updatedAt @map("updated_at")
