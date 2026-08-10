@@ -160,6 +160,8 @@ export class ProductService {
     // 4. Create product
     const shortDescription = (input as any).shortDescription || (input as any).short_description || null;
 
+    const rightChoice = (input as any).rightChoice !== undefined ? (input as any).rightChoice : (input as any).right_choice;
+
     return prisma.product.create({
       data: {
         name,
@@ -170,6 +172,7 @@ export class ProductService {
         categoryIds: finalCategoryIds,
         materialId,
         metadata: metadata,
+        rightChoice: rightChoice || undefined,
         image,
       },
     });
@@ -250,6 +253,11 @@ export class ProductService {
 
     if (metadata !== undefined) {
       dataToUpdate.metadata = metadata;
+    }
+
+    const rightChoice = (input as any).rightChoice !== undefined ? (input as any).rightChoice : (input as any).right_choice;
+    if (rightChoice !== undefined) {
+      dataToUpdate.rightChoice = rightChoice;
     }
 
     if (image !== undefined) {

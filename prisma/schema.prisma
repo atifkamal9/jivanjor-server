@@ -67,6 +67,7 @@ model Product {
   materialId       String?  @map("material_id")
   image            String?
   metadata         Json?    // Custom dynamic attributes
+  rightChoice      Json?    @map("right_choice")
   createdAt        DateTime @default(now()) @map("created_at")
   updatedAt        DateTime @updatedAt @map("updated_at")
 

@@ -78,6 +78,8 @@ export const createProductSchema = z.object({
     category_ids: z.array(z.string()).optional(),
     materialId: z.string().nullable().optional(),
     metadata: z.record(z.any()).optional(),
+    rightChoice: z.any().optional(),
+    right_choice: z.any().optional(),
     image: z.string().nullable().optional(),
   }),
 });
@@ -93,6 +95,8 @@ export const updateProductSchema = z.object({
     category_ids: z.array(z.string()).optional(),
     materialId: z.string().nullable().optional(),
     metadata: z.record(z.any()).optional(),
+    rightChoice: z.any().optional(),
+    right_choice: z.any().optional(),
     image: z.string().nullable().optional(),
   }),
 });
