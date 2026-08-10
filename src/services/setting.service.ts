@@ -3,6 +3,10 @@ import { prisma } from '../config/db';
 export const DEFAULT_SETTINGS = {
   desktopLogo: '/images/logo.png',
   mobileLogo: '/images/logo.png',
+  headerDesktopLogo: '/images/logo.png',
+  headerMobileLogo: '/images/logo.png',
+  footerDesktopLogo: '/images/logo.png',
+  footerMobileLogo: '/images/logo.png',
   categoryHeroCover: '/images/main-category-hero.png',
   categoryCardBg: '/images/placeholder.png',
   socialLinks: {
@@ -58,6 +62,10 @@ export class SettingService {
           id: 'site_settings',
           desktopLogo: DEFAULT_SETTINGS.desktopLogo,
           mobileLogo: DEFAULT_SETTINGS.mobileLogo,
+          headerDesktopLogo: DEFAULT_SETTINGS.headerDesktopLogo,
+          headerMobileLogo: DEFAULT_SETTINGS.headerMobileLogo,
+          footerDesktopLogo: DEFAULT_SETTINGS.footerDesktopLogo,
+          footerMobileLogo: DEFAULT_SETTINGS.footerMobileLogo,
           categoryHeroCover: DEFAULT_SETTINGS.categoryHeroCover,
           categoryCardBg: DEFAULT_SETTINGS.categoryCardBg,
           socialLinks: DEFAULT_SETTINGS.socialLinks,
@@ -79,10 +87,19 @@ export class SettingService {
       ? JSON.parse(settings.contactPage)
       : (settings.contactPage || DEFAULT_SETTINGS.contactPage);
 
+    const headerDesktopLogo = settings.headerDesktopLogo || settings.desktopLogo || DEFAULT_SETTINGS.headerDesktopLogo;
+    const headerMobileLogo = settings.headerMobileLogo || settings.mobileLogo || headerDesktopLogo || DEFAULT_SETTINGS.headerMobileLogo;
+    const footerDesktopLogo = settings.footerDesktopLogo || settings.desktopLogo || headerDesktopLogo || DEFAULT_SETTINGS.footerDesktopLogo;
+    const footerMobileLogo = settings.footerMobileLogo || settings.footerDesktopLogo || settings.mobileLogo || headerMobileLogo || DEFAULT_SETTINGS.footerMobileLogo;
+
     return {
       id: settings.id,
-      desktopLogo: settings.desktopLogo || DEFAULT_SETTINGS.desktopLogo,
-      mobileLogo: settings.mobileLogo || settings.desktopLogo || DEFAULT_SETTINGS.mobileLogo,
+      desktopLogo: settings.desktopLogo || headerDesktopLogo,
+      mobileLogo: settings.mobileLogo || headerMobileLogo,
+      headerDesktopLogo,
+      headerMobileLogo,
+      footerDesktopLogo,
+      footerMobileLogo,
       categoryHeroCover: settings.categoryHeroCover || DEFAULT_SETTINGS.categoryHeroCover,
       categoryCardBg: settings.categoryCardBg || DEFAULT_SETTINGS.categoryCardBg,
       socialLinks: {
@@ -115,6 +132,10 @@ export class SettingService {
   static async updateSettings(data: {
     desktopLogo?: string;
     mobileLogo?: string;
+    headerDesktopLogo?: string;
+    headerMobileLogo?: string;
+    footerDesktopLogo?: string;
+    footerMobileLogo?: string;
     categoryHeroCover?: string;
     categoryCardBg?: string;
     socialLinks?: Record<string, string>;
@@ -123,8 +144,13 @@ export class SettingService {
   }) {
     const current = await this.getSettings();
 
-    const newDesktopLogo = data.desktopLogo !== undefined ? data.desktopLogo : current.desktopLogo;
-    const newMobileLogo = data.mobileLogo !== undefined ? data.mobileLogo : current.mobileLogo;
+    const newHeaderDesktopLogo = data.headerDesktopLogo !== undefined ? data.headerDesktopLogo : (data.desktopLogo !== undefined ? data.desktopLogo : current.headerDesktopLogo);
+    const newHeaderMobileLogo = data.headerMobileLogo !== undefined ? data.headerMobileLogo : (data.mobileLogo !== undefined ? data.mobileLogo : current.headerMobileLogo);
+    const newFooterDesktopLogo = data.footerDesktopLogo !== undefined ? data.footerDesktopLogo : current.footerDesktopLogo;
+    const newFooterMobileLogo = data.footerMobileLogo !== undefined ? data.footerMobileLogo : current.footerMobileLogo;
+    const newDesktopLogo = data.desktopLogo !== undefined ? data.desktopLogo : newHeaderDesktopLogo;
+    const newMobileLogo = data.mobileLogo !== undefined ? data.mobileLogo : newHeaderMobileLogo;
+
     const newCategoryHeroCover = data.categoryHeroCover !== undefined ? data.categoryHeroCover : current.categoryHeroCover;
     const newCategoryCardBg = data.categoryCardBg !== undefined ? data.categoryCardBg : current.categoryCardBg;
     const newSocialLinks = {
@@ -143,6 +169,10 @@ export class SettingService {
         id: 'site_settings',
         desktopLogo: newDesktopLogo,
         mobileLogo: newMobileLogo,
+        headerDesktopLogo: newHeaderDesktopLogo,
+        headerMobileLogo: newHeaderMobileLogo,
+        footerDesktopLogo: newFooterDesktopLogo,
+        footerMobileLogo: newFooterMobileLogo,
         categoryHeroCover: newCategoryHeroCover,
         categoryCardBg: newCategoryCardBg,
         socialLinks: newSocialLinks,
@@ -152,6 +182,10 @@ export class SettingService {
       update: {
         desktopLogo: newDesktopLogo,
         mobileLogo: newMobileLogo,
+        headerDesktopLogo: newHeaderDesktopLogo,
+        headerMobileLogo: newHeaderMobileLogo,
+        footerDesktopLogo: newFooterDesktopLogo,
+        footerMobileLogo: newFooterMobileLogo,
         categoryHeroCover: newCategoryHeroCover,
         categoryCardBg: newCategoryCardBg,
         socialLinks: newSocialLinks,
@@ -172,10 +206,19 @@ export class SettingService {
       ? JSON.parse(settings.contactPage)
       : (settings.contactPage || DEFAULT_SETTINGS.contactPage);
 
+    const headerDesktopLogo = settings.headerDesktopLogo || settings.desktopLogo || DEFAULT_SETTINGS.headerDesktopLogo;
+    const headerMobileLogo = settings.headerMobileLogo || settings.mobileLogo || headerDesktopLogo || DEFAULT_SETTINGS.headerMobileLogo;
+    const footerDesktopLogo = settings.footerDesktopLogo || settings.desktopLogo || headerDesktopLogo || DEFAULT_SETTINGS.footerDesktopLogo;
+    const footerMobileLogo = settings.footerMobileLogo || settings.footerDesktopLogo || settings.mobileLogo || headerMobileLogo || DEFAULT_SETTINGS.footerMobileLogo;
+
     return {
       id: settings.id,
-      desktopLogo: settings.desktopLogo || DEFAULT_SETTINGS.desktopLogo,
-      mobileLogo: settings.mobileLogo || settings.desktopLogo || DEFAULT_SETTINGS.mobileLogo,
+      desktopLogo: settings.desktopLogo || headerDesktopLogo,
+      mobileLogo: settings.mobileLogo || headerMobileLogo,
+      headerDesktopLogo,
+      headerMobileLogo,
+      footerDesktopLogo,
+      footerMobileLogo,
       categoryHeroCover: settings.categoryHeroCover || DEFAULT_SETTINGS.categoryHeroCover,
       categoryCardBg: settings.categoryCardBg || DEFAULT_SETTINGS.categoryCardBg,
       socialLinks: {
@@ -202,4 +245,5 @@ export class SettingService {
     };
   }
 }
+
 
