@@ -13,6 +13,7 @@ declare global {
         email: string;
         role: string;
         name: string;
+        permissions?: string[];
       };
     }
   }
@@ -40,7 +41,7 @@ export const protect = catchAsync(async (req: Request, _res: Response, next: Nex
     // 3. Check if user still exists
     const currentUser = await prisma.user.findUnique({
       where: { id: decoded.userId },
-      select: { id: true, email: true, role: true, name: true },
+      select: { id: true, email: true, role: true, name: true, permissions: true },
     });
 
     if (!currentUser) {
@@ -62,6 +63,26 @@ export const restrictTo = (...roles: string[]) => {
   return (req: Request, _res: Response, next: NextFunction) => {
     if (!req.user || !roles.includes(req.user.role)) {
       return next(new AppError('You do not have permission to perform this action.', HttpCode.FORBIDDEN));
+    }
+    next();
+  };
+};
+
+/**
+ * Restrict routes to specific permissions or SUPER_ADMIN
+ */
+export const restrictToPermission = (...permissionKeys: string[]) => {
+  return (req: Request, _res: Response, next: NextFunction) => {
+    if (!req.user) {
+      return next(new AppError('You do not have permission to perform this action.', HttpCode.FORBIDDEN));
+    }
+    if (req.user.role === 'SUPER_ADMIN') {
+      return next();
+    }
+    const userPermissions = req.user.permissions || [];
+    const hasAny = permissionKeys.some((key) => userPermissions.includes(key));
+    if (!hasAny) {
+      return next(new AppError('You do not have permission to access this resource.', HttpCode.FORBIDDEN));
     }
     next();
   };

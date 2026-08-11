@@ -69,7 +69,7 @@ export class AuthService {
     }
 
     // 3. Generate token
-    const token = signToken({ userId: user.id, role: user.role });
+    const token = signToken({ userId: user.id, role: user.role, name: user.name, email: user.email, permissions: user.permissions });
 
     return {
       token,
@@ -78,6 +78,7 @@ export class AuthService {
         name: user.name,
         email: user.email,
         role: user.role,
+        permissions: user.permissions,
       },
     };
   }
