@@ -17,6 +17,7 @@ import pageRouter from './routes/page.routes';
 import uploadRouter from './routes/upload.routes';
 import menuRouter from './routes/menu.routes';
 import settingRouter from './routes/setting.routes';
+import userRouter from './routes/user.routes';
 
 const app = express();
 
@@ -48,6 +49,7 @@ app.use('/api/pages', pageRouter);
 app.use('/api/upload', uploadRouter);
 app.use('/api/menus', menuRouter);
 app.use('/api/settings', settingRouter);
+app.use('/api/users', userRouter);
 
 
 
