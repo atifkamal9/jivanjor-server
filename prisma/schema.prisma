@@ -199,4 +199,117 @@ model SiteSetting {
   @@map("site_settings")
 }
 
+enum CrmSyncStatus {
+  PENDING
+  PROCESSING
+  RETRY_SCHEDULED
+  SYNCED
+  FAILED
+  MANUAL_REVIEW
+}
+
+enum FormType {
+  CONTACT
+  DEALER
+  CONTRACTOR
+}
+
+model FormSubmission {
+  id                  String        @id @default(uuid())
+  crmExternalKey      String        @unique @map("crm_external_key")
+  formType            FormType      @map("form_type")
+  fullName            String        @map("full_name")
+  firmName            String?       @map("firm_name")
+  mobileRaw           String        @map("mobile_raw")
+  mobileNormalized    String        @map("mobile_normalized")
+  email               String?
+  city                String?
+  pinCode             String?       @map("pin_code")
+  queryType           String?       @map("query_type")
+  interestedIn        String?       @map("interested_in")
+  lineOfBusiness      String?       @map("line_of_business")
+  message             String?
+  consentGiven        Boolean       @map("consent_given")
+  consentTextVersion  String?       @map("consent_text_version")
+  sourceUrl           String?       @map("source_url")
+  referrerUrl         String?       @map("referrer_url")
+  utmSource           String?       @map("utm_source")
+  utmMedium           String?       @map("utm_medium")
+  utmCampaign         String?       @map("utm_campaign")
+  utmContent          String?       @map("utm_content")
+  utmTerm             String?       @map("utm_term")
+  gclid               String?
+  fbclid              String?
+  submittedAt         DateTime      @default(now()) @map("submitted_at")
+  zohoSyncStatus      CrmSyncStatus @default(PENDING) @map("zoho_sync_status")
+  zohoContactId       String?       @map("zoho_contact_id")
+  zohoEnquiryId       String?       @map("zoho_enquiry_id")
+  zohoContactAction   String?       @map("zoho_contact_action")
+  zohoEnquiryAction   String?       @map("zoho_enquiry_action")
+  zohoSyncAttempts    Int           @default(0) @map("zoho_sync_attempts")
+  zohoLastHttpStatus  Int?          @map("zoho_last_http_status")
+  zohoLastErrorCode   String?       @map("zoho_last_error_code")
+  zohoLastErrorMessage String?      @map("zoho_last_error_message")
+  zohoLastResponse    Json?         @map("zoho_last_response")
+  zohoLastAttemptAt   DateTime?     @map("zoho_last_attempt_at")
+  zohoSyncedAt        DateTime?     @map("zoho_synced_at")
+  nextRetryAt         DateTime?     @map("next_retry_at")
+  updatedAt           DateTime      @updatedAt @map("updated_at")
+
+  syncJob  CrmSyncJob?
+  attempts CrmSyncAttempt[]
+
+  @@map("form_submissions")
+}
+
+model CrmSyncJob {
+  id           String        @id @default(uuid())
+  submissionId String        @unique @map("submission_id")
+  status       CrmSyncStatus @default(PENDING)
+  availableAt  DateTime      @default(now()) @map("available_at")
+  lockedAt     DateTime?     @map("locked_at")
+  workerId     String?       @map("worker_id")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+
+  submission FormSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+
+  @@map("crm_sync_jobs")
+}
+
+model CrmSyncAttempt {
+  id              String        @id @default(uuid())
+  submissionId    String        @map("submission_id")
+  attemptNumber   Int           @map("attempt_number")
+  source          String        @map("source")
+  actor           String?       @map("actor")
+  status          CrmSyncStatus @map("status")
+  httpStatus      Int?          @map("http_status")
+  errorCode       String?       @map("error_code")
+  errorMessage    String?       @map("error_message")
+  responsePayload Json?         @map("response_payload")
+  startedAt       DateTime      @default(now()) @map("started_at")
+  completedAt     DateTime?     @map("completed_at")
+
+  submission FormSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+
+  @@map("crm_sync_attempts")
+}
+
+model AdminAuditLog {
+  id             String         @id @default(uuid())
+  adminUserId    String         @map("admin_user_id")
+  action         String         @map("action")
+  submissionId   String?        @map("submission_id")
+  reason         String?
+  previousStatus CrmSyncStatus? @map("previous_status")
+  newStatus      CrmSyncStatus? @map("new_status")
+  details        Json?
+  ipAddress      String?        @map("ip_address")
+  createdAt      DateTime       @default(now()) @map("created_at")
+
+  @@map("admin_audit_log")
+}
+
+
 

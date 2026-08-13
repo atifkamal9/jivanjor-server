@@ -18,6 +18,8 @@ import uploadRouter from './routes/upload.routes';
 import menuRouter from './routes/menu.routes';
 import settingRouter from './routes/setting.routes';
 import userRouter from './routes/user.routes';
+import formRouter from './modules/forms/form.routes';
+import adminCrmSyncRouter from './modules/admin/crm-sync/crm-sync.routes';
 
 const app = express();
 
@@ -50,6 +52,9 @@ app.use('/api/upload', uploadRouter);
 app.use('/api/menus', menuRouter);
 app.use('/api/settings', settingRouter);
 app.use('/api/users', userRouter);
+app.use('/api/forms', formRouter);
+app.use('/api/admin/form-submissions', adminCrmSyncRouter);
+
 
 
 
