@@ -62,11 +62,24 @@ export class ZohoHttpClient {
       const body = (await response.json()) as any;
 
       if (!response.ok) {
-        const errorMsg = body?.message || body?.code || `HTTP ${response.status} ${response.statusText}`;
+        const item = body?.data?.[0];
+        const detailMsg =
+          body?.message ||
+          body?.code ||
+          item?.message ||
+          item?.code ||
+          body?.error ||
+          (response.statusText ? `HTTP ${response.status} ${response.statusText}` : `HTTP ${response.status} Bad Request`);
+        
+        const detailsObj = item?.details || body?.details;
+        const detailsStr = detailsObj ? ` (${JSON.stringify(detailsObj)})` : '';
+        const errorMsg = `${detailMsg}${detailsStr}`;
+
         logger.error(`Zoho HTTP error for module ${moduleName}`, { status: response.status, body });
         const err: any = new Error(`Zoho API HTTP error: ${errorMsg}`);
         err.httpStatus = response.status;
-        err.code = body?.code || `HTTP_${response.status}`;
+        err.code = body?.code || item?.code || body?.error || `HTTP_${response.status}`;
+        err.rawDetails = body;
         throw err;
       }
 
