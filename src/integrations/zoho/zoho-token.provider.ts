@@ -38,9 +38,13 @@ async function requestNewToken(): Promise<CachedToken> {
   const body = await response.json() as any;
 
   if (!response.ok || body.error) {
-    const errorMsg = body.error || `HTTP ${response.status} ${response.statusText}`;
-    logger.error('Failed to refresh Zoho access token', { error: errorMsg });
-    throw new Error(`Zoho token refresh failed: ${errorMsg}`);
+    const errorMsg = body.error_description || body.error || body.message || (response.statusText ? `HTTP ${response.status} ${response.statusText}` : `HTTP ${response.status}`);
+    logger.error('Failed to refresh Zoho access token', { error: errorMsg, body });
+    const err: any = new Error(`Zoho token refresh failed: ${errorMsg}`);
+    err.httpStatus = response.status || 400;
+    err.code = body.error ? body.error.toUpperCase() : `AUTH_ERROR_${response.status}`;
+    err.rawDetails = body;
+    throw err;
   }
 
   const accessToken = body.access_token;

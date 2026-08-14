@@ -23,6 +23,24 @@ export function classifyZohoError(error: any, httpStatus?: number): ClassifiedEr
   const message = error?.message || 'Unknown error occurred during Zoho API operation';
   const code = error?.code || (httpStatus ? `HTTP_${httpStatus}` : 'UNKNOWN_ERROR');
 
+  const lowerMsg = message.toLowerCase();
+
+  // Check for Zoho OAuth authentication / token errors
+  if (
+    lowerMsg.includes('invalid_code') ||
+    lowerMsg.includes('token refresh failed') ||
+    error?.code === 'INVALID_CODE' ||
+    error?.code === 'INVALID_TOKEN'
+  ) {
+    return {
+      status: CrmSyncStatus.FAILED,
+      isTransient: false,
+      requiresManualReview: false,
+      errorCode: 'ZOHO_AUTH_INVALID_TOKEN',
+      errorMessage: 'Zoho OAuth refresh token is invalid or expired. Please re-authenticate Zoho CRM and update ZOHO_REFRESH_TOKEN in environment settings.',
+    };
+  }
+
   // Handle specific Zoho record error codes
   if (error instanceof ZohoRecordError || error?.code) {
     const errCode = (error.code || '').toUpperCase();
@@ -37,7 +55,7 @@ export function classifyZohoError(error: any, httpStatus?: number): ClassifiedEr
       };
     }
 
-    if (errCode === 'INVALID_DATA' || errCode === 'MANDATORY_NOT_FOUND') {
+    if (errCode === 'INVALID_DATA' || errCode === 'MANDATORY_NOT_FOUND' || errCode === 'INVALID_MODULE') {
       return {
         status: CrmSyncStatus.FAILED,
         isTransient: false,
@@ -100,7 +118,6 @@ export function classifyZohoError(error: any, httpStatus?: number): ClassifiedEr
   }
 
   // Network timeouts, socket hangup, or connection refused
-  const lowerMsg = message.toLowerCase();
   if (
     lowerMsg.includes('timeout') ||
     lowerMsg.includes('econnreset') ||
