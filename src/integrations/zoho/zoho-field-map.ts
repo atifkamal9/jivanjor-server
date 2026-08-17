@@ -24,6 +24,8 @@ export const ZOHO_ENQUIRY_FIELDS = {
   CONTACT: 'Contact', // Lookup object: { id: zoho_contact_id }
   FORM_TYPE: 'Form_Type', // CONTACT / DEALER / CONTRACTOR
   FULL_NAME_SNAPSHOT: 'Full_Name_Snapshot',
+  FIRST_NAME: 'First_Name',
+  LAST_NAME: 'Last_Name',
   FIRM_NAME: 'Firm_Name',
   MOBILE_SNAPSHOT: 'Mobile_Snapshot',
   CITY: 'City',

@@ -1,20 +1,20 @@
 import { FormSubmission } from '@prisma/client';
 import { ZOHO_CONTACT_FIELDS } from './zoho-field-map';
 
-export function splitFullName(fullName: string): { firstName: string; lastName: string } {
-  const trimmed = fullName.trim();
+export function splitFullName(fullName?: string | null): { firstName: string; lastName: string } {
+  const trimmed = (fullName || '').trim();
   if (!trimmed) {
     return { firstName: '', lastName: 'Unknown' };
   }
 
-  const parts = trimmed.split(/\s+/);
+  const parts = trimmed.split(/\s+/).filter(Boolean);
   if (parts.length === 1) {
-    return { firstName: '', lastName: parts[0] };
+    return { firstName: '', lastName: parts[0] || 'Unknown' };
   }
 
-  const lastName = parts.pop() || '';
+  const lastName = parts.pop() || 'Unknown';
   const firstName = parts.join(' ');
-  return { firstName, lastName };
+  return { firstName, lastName: lastName || 'Unknown' };
 }
 
 export function mapSubmissionToZohoContactPayload(submission: FormSubmission): Record<string, any> {

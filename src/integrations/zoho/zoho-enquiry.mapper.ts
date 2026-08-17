@@ -1,12 +1,17 @@
 import { FormSubmission } from '@prisma/client';
 import { ZOHO_ENQUIRY_FIELDS } from './zoho-field-map';
+import { splitFullName } from './zoho-contact.mapper';
 
 export function mapSubmissionToZohoEnquiryPayload(
   submission: FormSubmission,
   zohoContactId: string
 ): Record<string, any> {
+  const { firstName, lastName } = splitFullName(submission.fullName);
+
   const payload: Record<string, any> = {
     [ZOHO_ENQUIRY_FIELDS.NAME]: submission.crmExternalKey,
+    [ZOHO_ENQUIRY_FIELDS.FIRST_NAME]: firstName,
+    [ZOHO_ENQUIRY_FIELDS.LAST_NAME]: lastName,
     [ZOHO_ENQUIRY_FIELDS.WEBSITE_ENTRY_ID]: submission.crmExternalKey,
     [ZOHO_ENQUIRY_FIELDS.CONTACT]: { id: zohoContactId },
     [ZOHO_ENQUIRY_FIELDS.FORM_TYPE]: submission.formType,
