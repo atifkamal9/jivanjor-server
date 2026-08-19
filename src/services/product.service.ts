@@ -13,6 +13,7 @@ export interface ProductQueryParams {
   search?: string;
   page?: string;
   limit?: string;
+  visibleOnly?: string | boolean;
 }
 
 export class ProductService {
@@ -20,7 +21,7 @@ export class ProductService {
    * Get all products with optional filters and pagination
    */
   static async getAll(params: ProductQueryParams) {
-    const { categoryId, materialId, search, page = '1', limit = '10' } = params;
+    const { categoryId, materialId, search, page = '1', limit = '10', visibleOnly } = params;
 
     const pageNum = parseInt(page, 10);
     const limitNum = parseInt(limit, 10);
@@ -28,6 +29,17 @@ export class ProductService {
 
     // Build Prisma query filter object
     const whereClause: any = {};
+
+    if (visibleOnly === 'true' || visibleOnly === true) {
+      whereClause.isVisible = true;
+      whereClause.category = {
+        isVisible: true,
+        OR: [
+          { parentId: null },
+          { parent: { isVisible: true } },
+        ],
+      };
+    }
 
     if (categoryId) {
       whereClause.OR = [
@@ -125,6 +137,7 @@ export class ProductService {
    */
   static async create(input: CreateProductInput) {
     const { name, description, categoryId, materialId, metadata, image } = input;
+    const isVisibleInput = (input as any).isVisible;
     const rawCategoryIds: string[] = (input as any).categoryIds || (input as any).category_ids || [];
     const finalCategoryIds = rawCategoryIds.length > 0
       ? Array.from(new Set(rawCategoryIds)).filter(Boolean)
@@ -159,7 +172,6 @@ export class ProductService {
 
     // 4. Create product
     const shortDescription = (input as any).shortDescription || (input as any).short_description || null;
-
     const rightChoice = (input as any).rightChoice !== undefined ? (input as any).rightChoice : (input as any).right_choice;
 
     return prisma.product.create({
@@ -174,6 +186,7 @@ export class ProductService {
         metadata: metadata,
         rightChoice: rightChoice || undefined,
         image,
+        isVisible: isVisibleInput !== undefined ? isVisibleInput : true,
       },
     });
   }
@@ -183,6 +196,7 @@ export class ProductService {
    */
   static async update(id: string, input: UpdateProductInput) {
     const { name, description, categoryId, materialId, metadata, image } = input;
+    const isVisibleInput = (input as any).isVisible;
     const rawCategoryIds: string[] = (input as any).categoryIds || (input as any).category_ids;
 
     // 1. Verify product exists
@@ -262,6 +276,10 @@ export class ProductService {
 
     if (image !== undefined) {
       dataToUpdate.image = image;
+    }
+
+    if (isVisibleInput !== undefined) {
+      dataToUpdate.isVisible = isVisibleInput;
     }
 
     return prisma.product.update({
