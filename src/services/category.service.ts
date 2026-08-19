@@ -23,8 +23,14 @@ export class CategoryService {
   /**
    * Get all categories
    */
-  static async getAll(treeMode = false) {
+  static async getAll(treeMode = false, visibleOnly = false) {
+    const whereClause: any = {};
+    if (visibleOnly) {
+      whereClause.isVisible = true;
+    }
+
     const categories = await prisma.productCategory.findMany({
+      where: whereClause,
       orderBy: { name: 'asc' },
       include: {
         _count: {
@@ -71,6 +77,10 @@ export class CategoryService {
    */
   static async create(input: CreateCategoryInput) {
     const { name, parentId, description, tagline, icon } = input as any;
+    const isVisibleInput = (input as any).isVisible;
+    const hideInMenuInput = (input as any).hideInMenu;
+    const finalIsVisible = isVisibleInput !== undefined ? isVisibleInput : (hideInMenuInput !== undefined ? !hideInMenuInput : true);
+
     const slug = slugify(name);
 
     // Check slug uniqueness
@@ -99,6 +109,7 @@ export class CategoryService {
         description,
         tagline: tagline || null,
         icon: icon || null,
+        isVisible: finalIsVisible,
       },
     });
   }
@@ -108,6 +119,8 @@ export class CategoryService {
    */
   static async update(id: string, input: UpdateCategoryInput) {
     const { name, parentId, description, tagline, icon } = input as any;
+    const isVisibleInput = (input as any).isVisible;
+    const hideInMenuInput = (input as any).hideInMenu;
 
     // 1. Verify category exists
     const category = await prisma.productCategory.findUnique({
@@ -164,6 +177,12 @@ export class CategoryService {
     // 4. Handle icon update
     if (icon !== undefined) {
       dataToUpdate.icon = icon || null;
+    }
+
+    if (isVisibleInput !== undefined) {
+      dataToUpdate.isVisible = isVisibleInput;
+    } else if (hideInMenuInput !== undefined) {
+      dataToUpdate.isVisible = !hideInMenuInput;
     }
 
     return prisma.productCategory.update({
