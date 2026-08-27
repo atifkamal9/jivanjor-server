@@ -1,5 +1,4 @@
 import { FormSubmission } from '@prisma/client';
-import { ZOHO_CONTACT_FIELDS } from './zoho-field-map';
 
 export function splitFullName(fullName?: string | null): { firstName: string; lastName: string } {
   const trimmed = (fullName || '').trim();
@@ -17,35 +16,73 @@ export function splitFullName(fullName?: string | null): { firstName: string; la
   return { firstName, lastName: lastName || 'Unknown' };
 }
 
+export function getQueryTypeDifferentiator(submission: FormSubmission): string {
+  if (submission.queryType && submission.queryType.trim()) {
+    return submission.queryType.trim();
+  }
+
+  if (submission.formType === 'DEALER') {
+    const details = [submission.interestedIn, submission.lineOfBusiness].filter(Boolean).join(' - ');
+    return details ? `Dealer Enquiry (${details})` : 'Become a Dealer';
+  }
+
+  if (submission.formType === 'CONTRACTOR') {
+    return 'Contractor Connect';
+  }
+
+  return 'General Enquiry';
+}
+
+export function getContactType(submission: FormSubmission): string {
+  if (submission.formType === 'DEALER') return 'Dealer';
+  if (submission.formType === 'CONTRACTOR') return 'Contractor';
+  return 'Customer';
+}
+
 export function mapSubmissionToZohoContactPayload(submission: FormSubmission): Record<string, any> {
   const { firstName, lastName } = splitFullName(submission.fullName);
 
-  const payload: Record<string, any> = {
-    [ZOHO_CONTACT_FIELDS.FIRST_NAME]: firstName,
-    [ZOHO_CONTACT_FIELDS.LAST_NAME]: lastName,
-    [ZOHO_CONTACT_FIELDS.MOBILE]: submission.mobileRaw,
-    [ZOHO_CONTACT_FIELDS.WEBSITE_MOBILE_KEY]: submission.mobileNormalized,
-    [ZOHO_CONTACT_FIELDS.LAST_WEBSITE_ENTRY_ID]: submission.crmExternalKey,
-    [ZOHO_CONTACT_FIELDS.LAST_WEBSITE_FORM_TYPE]: submission.formType,
-    [ZOHO_CONTACT_FIELDS.WEBSITE_CONSENT]: submission.consentGiven,
-    [ZOHO_CONTACT_FIELDS.WEBSITE_SOURCE]: 'Jivanjor Website',
-  };
+  const mobileClean = (submission.mobileNormalized || submission.mobileRaw || '').replace(/[^\d+]/g, '');
+  const typeOfQuery = getQueryTypeDifferentiator(submission);
+  const contactType = getContactType(submission);
 
-  if (submission.email) {
-    payload[ZOHO_CONTACT_FIELDS.EMAIL] = submission.email;
-  }
-  if (submission.city) {
-    payload[ZOHO_CONTACT_FIELDS.MAILING_CITY] = submission.city;
-  }
-  if (submission.pinCode) {
-    payload[ZOHO_CONTACT_FIELDS.MAILING_ZIP] = submission.pinCode;
-  }
-  if (submission.firmName) {
-    payload[ZOHO_CONTACT_FIELDS.FIRM_NAME] = submission.firmName;
-  }
-  if (submission.queryType) {
-    payload[ZOHO_CONTACT_FIELDS.LAST_QUERY_TYPE] = submission.queryType;
-  }
+  const payload: Record<string, any> = {
+    // Exact accepted Zoho CRM fields
+    Pin_Code: submission.pinCode || '',
+    Type_Of_Query: typeOfQuery,
+    Phone: submission.mobileRaw || mobileClean,
+    Mobile: mobileClean,
+    District_City: submission.city || '',
+    Description: submission.message || `${contactType} form submission on Jivanjor website`,
+
+    // Core Name & Email fields
+    First_Name: firstName,
+    Last_Name: lastName,
+    Email: submission.email || '',
+    Firm_Name: submission.firmName || '',
+
+    // Duplicate key & source metadata
+    Website_Mobile_Key: mobileClean,
+    Source: `Jivanjor Website - ${contactType}`,
+    Lead_Source: 'Jivanjor Website',
+    Website_Source: 'Jivanjor Website',
+
+    // Fallback alias fields for full CRM compatibility
+    Mailing_City: submission.city || '',
+    City: submission.city || '',
+    District: submission.city || '',
+    Mailing_Zip: submission.pinCode || '',
+    Zip_Code: submission.pinCode || '',
+    Pincode: submission.pinCode || '',
+    Query_Type: typeOfQuery,
+    Type_of_Query: typeOfQuery,
+    Last_Query_Type: typeOfQuery,
+    Remarks: submission.message || '',
+    Message: submission.message || '',
+    Last_Website_Entry_ID: submission.crmExternalKey,
+    Last_Website_Form_Type: submission.formType,
+    Website_Consent: submission.consentGiven,
+  };
 
   return payload;
 }

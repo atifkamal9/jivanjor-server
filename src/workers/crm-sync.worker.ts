@@ -66,7 +66,7 @@ export async function processSingleSyncJob(
     const contactResult = await zohoHttpClient.upsertRecord(
       config.contactsModule,
       contactPayload,
-      ['Website_Mobile_Key']
+      ['Mobile', 'Website_Mobile_Key', 'Email']
     );
 
     // 3. Upsert Website Enquiry / Note to Zoho CRM
@@ -74,7 +74,7 @@ export async function processSingleSyncJob(
     const enquiryResult = await zohoHttpClient.upsertRecord(
       config.enquiryModule,
       enquiryPayload,
-      ['Website_Entry_ID']
+      ['Website_Entry_ID', 'Name']
     );
 
     const completedAt = new Date();
