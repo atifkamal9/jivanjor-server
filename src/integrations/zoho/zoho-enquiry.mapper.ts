@@ -21,7 +21,6 @@ export function mapSubmissionToZohoEnquiryPayload(
     Phone: submission.mobileRaw || mobileClean,
     Mobile: mobileClean,
     District_City: submission.city || '',
-    Contact_Type: contactType,
     Description: submission.message || `${contactType} form submission on Jivanjor website`,
 
     // Name & Firm

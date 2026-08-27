@@ -53,7 +53,6 @@ export function mapSubmissionToZohoContactPayload(submission: FormSubmission): R
     Phone: submission.mobileRaw || mobileClean,
     Mobile: mobileClean,
     District_City: submission.city || '',
-    Contact_Type: contactType,
     Description: submission.message || `${contactType} form submission on Jivanjor website`,
 
     // Core Name & Email fields

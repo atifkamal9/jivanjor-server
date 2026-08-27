@@ -10,7 +10,6 @@ export const ZOHO_CONTACT_FIELDS = {
   PIN_CODE: 'Pin_Code',
   TYPE_OF_QUERY: 'Type_Of_Query',
   DISTRICT_CITY: 'District_City',
-  CONTACT_TYPE: 'Contact_Type',
   DESCRIPTION: 'Description',
   EMAIL: 'Email',
   FIRM_NAME: 'Firm_Name',
