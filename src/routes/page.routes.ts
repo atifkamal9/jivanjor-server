@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { PageController } from '../controllers/page.controller';
 import { validate } from '../middleware/validate';
-import { protect, restrictTo } from '../middleware/auth';
+import { protect, restrictToPermission } from '../middleware/auth';
 import { createPageSchema, updatePageSchema } from '../utils/validation';
 
 const router = Router();
@@ -11,7 +11,7 @@ router.get('/:idOrSlug', PageController.getOne);
 router.get('/', PageController.getAll);
 
 // Protected Admin routes
-router.use(protect, restrictTo('ADMIN', 'SUPER_ADMIN'));
+router.use(protect, restrictToPermission('manage_pages'));
 
 router.post('/', validate(createPageSchema), PageController.create);
 router.put('/:id', validate(updatePageSchema), PageController.update);

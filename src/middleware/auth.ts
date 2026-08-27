@@ -80,6 +80,9 @@ export const restrictToPermission = (...permissionKeys: string[]) => {
       return next();
     }
     const userPermissions = req.user.permissions || [];
+    if (req.user.role === 'ADMIN' && userPermissions.length === 0) {
+      return next();
+    }
     const hasAny = permissionKeys.some((key) => userPermissions.includes(key));
     if (!hasAny) {
       return next(new AppError('You do not have permission to access this resource.', HttpCode.FORBIDDEN));

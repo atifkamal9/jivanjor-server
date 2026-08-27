@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { CategoryController } from '../controllers/category.controller';
 import { validate } from '../middleware/validate';
-import { protect, restrictTo } from '../middleware/auth';
+import { protect, restrictToPermission } from '../middleware/auth';
 import { createCategorySchema, updateCategorySchema } from '../utils/validation';
 
 const router = Router();
@@ -11,7 +11,7 @@ router.get('/', CategoryController.getAll);
 router.get('/:idOrSlug', CategoryController.getOne);
 
 // Protected Admin routes
-router.use(protect, restrictTo('ADMIN', 'SUPER_ADMIN'));
+router.use(protect, restrictToPermission('manage_categories'));
 
 router.post('/', validate(createCategorySchema), CategoryController.create);
 router.put('/:id', validate(updateCategorySchema), CategoryController.update);
