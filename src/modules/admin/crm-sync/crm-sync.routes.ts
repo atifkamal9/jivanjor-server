@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { protect, restrictTo } from '../../../middleware/auth';
+import { protect, restrictToPermission } from '../../../middleware/auth';
 import { catchAsync } from '../../../middleware/errorHandler';
 import { crmSyncService } from './crm-sync.service';
 
@@ -7,7 +7,7 @@ const router = Router();
 
 // Protect all admin sync management routes
 router.use(protect);
-router.use(restrictTo('ADMIN', 'SUPER_ADMIN'));
+router.use(restrictToPermission('manage_forms'));
 
 /**
  * GET /api/admin/form-submissions/health

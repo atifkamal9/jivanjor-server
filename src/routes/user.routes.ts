@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { UserController } from '../controllers/user.controller';
-import { protect, restrictTo } from '../middleware/auth';
+import { protect, restrictToPermission } from '../middleware/auth';
 import { validate } from '../middleware/validate';
 import { createUserSchema, updateUserSchema } from '../utils/validation';
 
@@ -8,7 +8,7 @@ const router = Router();
 
 // Protect all routes in user management
 router.use(protect);
-router.use(restrictTo('SUPER_ADMIN', 'ADMIN'));
+router.use(restrictToPermission('manage_users'));
 
 router.get('/', UserController.getUsers);
 router.get('/:id', UserController.getUser);

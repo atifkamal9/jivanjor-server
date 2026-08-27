@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { SEOController } from '../controllers/seo.controller';
 import { validate } from '../middleware/validate';
-import { protect, restrictTo } from '../middleware/auth';
+import { protect, restrictToPermission } from '../middleware/auth';
 import { createOrUpdateSEOSchema } from '../utils/validation';
 
 const router = Router();
@@ -10,7 +10,7 @@ const router = Router();
 router.get('/', SEOController.getOne);
 
 // Protected Admin routes
-router.use(protect, restrictTo('ADMIN', 'SUPER_ADMIN'));
+router.use(protect, restrictToPermission('manage_settings'));
 
 router.post('/', validate(createOrUpdateSEOSchema), SEOController.upsert);
 router.delete('/', SEOController.delete);
