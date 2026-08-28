@@ -52,6 +52,8 @@ export const createCategorySchema = z.object({
     description: z.string().optional(),
     tagline: z.string().optional().nullable(),
     icon: z.string().optional().nullable(),
+    displayOrder: z.number().int().optional(),
+    display_order: z.number().int().optional(),
     sections: z.union([z.record(z.any()), z.array(z.any())]).nullable().optional(),
   }),
 });
@@ -63,6 +65,19 @@ export const updateCategorySchema = z.object({
     description: z.string().optional(),
     tagline: z.string().optional().nullable(),
     icon: z.string().optional().nullable(),
+    displayOrder: z.number().int().optional(),
+    display_order: z.number().int().optional(),
+  }),
+});
+
+export const reorderCategoriesSchema = z.object({
+  body: z.object({
+    items: z.array(
+      z.object({
+        id: z.string().min(1, 'Category ID is required'),
+        displayOrder: z.number().int(),
+      })
+    ).min(1, 'Items array cannot be empty'),
   }),
 });
 

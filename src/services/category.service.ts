@@ -31,7 +31,7 @@ export class CategoryService {
 
     const categories = await prisma.productCategory.findMany({
       where: whereClause,
-      orderBy: { name: 'asc' },
+      orderBy: [{ displayOrder: 'asc' }, { name: 'asc' }],
       include: {
         _count: {
           select: { products: true },
@@ -76,7 +76,8 @@ export class CategoryService {
    * Create a new category
    */
   static async create(input: CreateCategoryInput) {
-    const { name, parentId, description, tagline, icon } = input as any;
+    const { name, parentId, description, tagline, icon, displayOrder, display_order } = input as any;
+    const finalDisplayOrder = displayOrder !== undefined ? displayOrder : (display_order !== undefined ? display_order : 0);
     const isVisibleInput = (input as any).isVisible;
     const hideInMenuInput = (input as any).hideInMenu;
     const finalIsVisible = isVisibleInput !== undefined ? isVisibleInput : (hideInMenuInput !== undefined ? !hideInMenuInput : true);
@@ -109,6 +110,7 @@ export class CategoryService {
         description,
         tagline: tagline || null,
         icon: icon || null,
+        displayOrder: finalDisplayOrder,
         isVisible: finalIsVisible,
       },
     });
@@ -118,7 +120,8 @@ export class CategoryService {
    * Update category
    */
   static async update(id: string, input: UpdateCategoryInput) {
-    const { name, parentId, description, tagline, icon } = input as any;
+    const { name, parentId, description, tagline, icon, displayOrder, display_order } = input as any;
+    const finalDisplayOrder = displayOrder !== undefined ? displayOrder : display_order;
     const isVisibleInput = (input as any).isVisible;
     const hideInMenuInput = (input as any).hideInMenu;
 
@@ -178,6 +181,9 @@ export class CategoryService {
     if (icon !== undefined) {
       dataToUpdate.icon = icon || null;
     }
+    if (finalDisplayOrder !== undefined) {
+      dataToUpdate.displayOrder = finalDisplayOrder;
+    }
 
     if (isVisibleInput !== undefined) {
       dataToUpdate.isVisible = isVisibleInput;
@@ -194,6 +200,22 @@ export class CategoryService {
   /**
    * Delete category
    */
+  
+  /**
+   * Reorder categories batch
+   */
+  static async reorder(items: { id: string; displayOrder: number }[]) {
+    await prisma.$transaction(
+      items.map((item) =>
+        prisma.productCategory.update({
+          where: { id: item.id },
+          data: { displayOrder: item.displayOrder },
+        })
+      )
+    );
+    return true;
+  }
+
   static async delete(id: string) {
     const category = await prisma.productCategory.findUnique({
       where: { id },
