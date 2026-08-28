@@ -11,6 +11,8 @@ export interface CreateSubmissionParams {
   mobileNormalized: string;
   email?: string | null;
   city?: string | null;
+  location?: string | null;
+  state?: string | null;
   pinCode?: string | null;
   queryType?: string | null;
   interestedIn?: string | null;
@@ -48,6 +50,8 @@ export class FormSubmissionRepository {
           mobileNormalized: params.mobileNormalized,
           email: params.email || null,
           city: params.city || null,
+          location: params.location || null,
+          state: params.state || null,
           pinCode: params.pinCode || null,
           queryType: params.queryType || null,
           interestedIn: params.interestedIn || null,

@@ -226,6 +226,8 @@ model FormSubmission {
   mobileNormalized    String        @map("mobile_normalized")
   email               String?
   city                String?
+  location            String?       @map("location")
+  state               String?       @map("state")
   pinCode             String?       @map("pin_code")
   queryType           String?       @map("query_type")
   interestedIn        String?       @map("interested_in")

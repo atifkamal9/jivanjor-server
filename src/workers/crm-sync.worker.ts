@@ -51,6 +51,17 @@ export async function processSingleSyncJob(
     return;
   }
 
+  if (submission.zohoSyncStatus === CrmSyncStatus.SYNCED) {
+    logger.warn('Submission already synced to Zoho CRM, skipping redundant execution', { submissionId });
+    await prisma.crmSyncJob.delete({ where: { id: jobId } }).catch(() => {});
+    return;
+  }
+
+  await prisma.formSubmission.update({
+    where: { id: submissionId },
+    data: { zohoSyncStatus: CrmSyncStatus.PROCESSING },
+  });
+
   const currentAttemptNumber = submission.zohoSyncAttempts + 1;
   const startedAt = new Date();
 
@@ -61,20 +72,61 @@ export async function processSingleSyncJob(
   });
 
   try {
-    // 2. Upsert Contact to Zoho CRM
+    if (submission.pinCode && (!submission.state || !(submission).location)) {
+      try {
+        const pinRecord = await prisma.pinCode.findUnique({ where: { pinCode: submission.pinCode.trim() } });
+        if (pinRecord) {
+          if (!submission.city) submission.city = pinRecord.city;
+          if (!(submission).state) (submission).state = pinRecord.state;
+          if (!(submission).location) (submission).location = pinRecord.location;
+        }
+      } catch (err) {}
+    }
+
+    // 2. Search & Upsert Contact in Zoho CRM
     const contactPayload = mapSubmissionToZohoContactPayload(submission);
+    
+    // Extract clean 10-digit mobile number
+    const clean10 = (submission.mobileNormalized || submission.mobileRaw || '').replace(/\D/g, '').slice(-10);
+    if (clean10 && clean10.length === 10) {
+      const clean12 = `91${clean10}`;
+      const searchCriteria = `((Mobile:equals:${clean10}) or (Phone:equals:${clean10}) or (Mobile:equals:${clean12}) or (Phone:equals:${clean12}))`;
+      
+      try {
+        const existingContacts = await zohoHttpClient.searchRecords(config.contactsModule, searchCriteria);
+        if (existingContacts && existingContacts.length > 0 && existingContacts[0]?.id) {
+          contactPayload.id = existingContacts[0].id;
+          logger.info(`Found existing Zoho Contact ID ${contactPayload.id} for mobile ${clean10}. Linking submission.`);
+        }
+      } catch (err) {
+        logger.warn(`Contact search failed for ${clean10}, falling back to upsert by Mobile`, { err });
+      }
+    }
+
     const contactResult = await zohoHttpClient.upsertRecord(
       config.contactsModule,
       contactPayload,
-      ['Mobile', 'Website_Mobile_Key', 'Email']
+      ['Mobile']
     );
 
-    // 3. Upsert Website Enquiry / Note to Zoho CRM
+    // 3. Search & Upsert Website Enquiry in Zoho CRM
     const enquiryPayload = mapSubmissionToZohoEnquiryPayload(submission, contactResult.zohoId);
+    
+    try {
+      const searchEnquiryCriteria = `((Website_Entry_ID:equals:${submission.crmExternalKey}) or (Name:equals:${submission.crmExternalKey}))`;
+      const existingEnquiries = await zohoHttpClient.searchRecords(config.enquiryModule, searchEnquiryCriteria);
+      if (existingEnquiries && existingEnquiries.length > 0 && existingEnquiries[0]?.id) {
+        enquiryPayload.id = existingEnquiries[0].id;
+        logger.info(`Found existing Zoho Enquiry ID ${enquiryPayload.id} for entry ${submission.crmExternalKey}. Updating.`);
+      }
+    } catch (err) {
+      logger.warn(`Enquiry search failed for ${submission.crmExternalKey}, falling back to upsert`, { err });
+    }
+
     const enquiryResult = await zohoHttpClient.upsertRecord(
       config.enquiryModule,
       enquiryPayload,
-      ['Website_Entry_ID', 'Name']
+      ['Website_Entry_ID']
     );
 
     const completedAt = new Date();
@@ -214,15 +266,23 @@ export async function runCrmSyncWorkerStep(): Promise<boolean> {
   }
 
   try {
-    // 1. Claim job using FOR UPDATE SKIP LOCKED
+    // 1. Atomically claim and mark job as PROCESSING in a single SQL operation
     const claimedJobs: Array<{ id: string; submission_id: string }> = await prisma.$queryRaw`
-      SELECT id, submission_id
-      FROM crm_sync_jobs
-      WHERE status IN ('PENDING', 'RETRY_SCHEDULED')
-        AND available_at <= NOW()
-      ORDER BY available_at ASC
-      FOR UPDATE SKIP LOCKED
-      LIMIT 1;
+      UPDATE crm_sync_jobs
+      SET status = 'PROCESSING',
+          locked_at = NOW(),
+          worker_id = ${WORKER_ID}
+      WHERE id = (
+        SELECT id
+        FROM crm_sync_jobs
+        WHERE status IN ('PENDING', 'RETRY_SCHEDULED')
+          AND available_at <= NOW()
+        ORDER BY available_at ASC
+
+        FOR UPDATE SKIP LOCKED
+        LIMIT 1
+      )
+      RETURNING id, submission_id;
     `;
 
     if (!claimedJobs || claimedJobs.length === 0) {
@@ -231,20 +291,10 @@ export async function runCrmSyncWorkerStep(): Promise<boolean> {
 
     const job = claimedJobs[0];
 
-    // 2. Mark job as PROCESSING inside short transaction
-    await prisma.crmSyncJob.update({
-      where: { id: job.id },
-      data: {
-        status: CrmSyncStatus.PROCESSING,
-        lockedAt: new Date(),
-        workerId: WORKER_ID,
-      },
-    });
-
-    // 3. Process job outside DB lock
+    // 2. Process job outside DB lock
     await processSingleSyncJob(job.id, job.submission_id, 'AUTO', WORKER_ID);
     return true;
-  } catch (error) {
+    } catch (error) {
     logger.error('Error during worker job claim step', { error });
     return false;
   }
