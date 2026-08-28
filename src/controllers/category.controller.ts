@@ -53,6 +53,18 @@ export class CategoryController {
   /**
    * Delete category
    */
+  
+  /**
+   * Reorder categories batch
+   */
+  static reorder = catchAsync(async (req: Request, res: Response) => {
+    await CategoryService.reorder(req.body.items);
+    return res.status(HttpCode.OK).json({
+      status: 'success',
+      message: 'Categories reordered successfully',
+    });
+  });
+
   static delete = catchAsync(async (req: Request, res: Response) => {
     await CategoryService.delete(req.params.id);
     return res.status(HttpCode.OK).json({

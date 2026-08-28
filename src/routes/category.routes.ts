@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { CategoryController } from '../controllers/category.controller';
 import { validate } from '../middleware/validate';
 import { protect, restrictToPermission } from '../middleware/auth';
-import { createCategorySchema, updateCategorySchema } from '../utils/validation';
+import { createCategorySchema, updateCategorySchema, reorderCategoriesSchema } from '../utils/validation';
 
 const router = Router();
 
@@ -14,6 +14,7 @@ router.get('/:idOrSlug', CategoryController.getOne);
 router.use(protect, restrictToPermission('manage_categories'));
 
 router.post('/', validate(createCategorySchema), CategoryController.create);
+router.put('/reorder', validate(reorderCategoriesSchema), CategoryController.reorder);
 router.put('/:id', validate(updateCategorySchema), CategoryController.update);
 router.delete('/:id', CategoryController.delete);
 

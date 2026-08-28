@@ -33,6 +33,7 @@ model ProductCategory {
   description String?
   tagline     String?
   icon        String?           // Pre-stored platform icon key (e.g. Lucide icon name)
+  displayOrder Int               @default(0) @map("display_order")
   isVisible   Boolean           @default(true) @map("is_visible")
   createdAt   DateTime          @default(now()) @map("created_at")
   updatedAt   DateTime          @updatedAt @map("updated_at")
