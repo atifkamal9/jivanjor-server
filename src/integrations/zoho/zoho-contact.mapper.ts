@@ -84,9 +84,48 @@ export function mapSubmissionToZohoContactPayload(submission: FormSubmission): R
     Remarks: submission.message || '',
     Message: submission.message || '',
     Last_Website_Entry_ID: submission.crmExternalKey,
+    Website_Entry_ID: submission.crmExternalKey,
+    Form_Type: submission.formType,
     Last_Website_Form_Type: submission.formType,
     Website_Consent: submission.consentGiven,
   };
+
+  if (submission.interestedIn) {
+    payload.Interested_In = submission.interestedIn;
+  }
+  if (submission.lineOfBusiness) {
+    payload.Line_of_Business = submission.lineOfBusiness;
+  }
+  if (submission.consentTextVersion) {
+    payload.Consent_Text_Version = submission.consentTextVersion;
+  }
+  if (submission.sourceUrl) {
+    payload.Source_URL = submission.sourceUrl;
+  }
+  if (submission.referrerUrl) {
+    payload.Referrer_URL = submission.referrerUrl;
+  }
+  if (submission.utmSource) {
+    payload.UTM_Source = submission.utmSource;
+  }
+  if (submission.utmMedium) {
+    payload.UTM_Medium = submission.utmMedium;
+  }
+  if (submission.utmCampaign) {
+    payload.UTM_Campaign = submission.utmCampaign;
+  }
+  if (submission.utmContent) {
+    payload.UTM_Content = submission.utmContent;
+  }
+  if (submission.utmTerm) {
+    payload.UTM_Term = submission.utmTerm;
+  }
+  if (submission.gclid) {
+    payload.GCLID = submission.gclid;
+  }
+  if (submission.fbclid) {
+    payload.FBCLID = submission.fbclid;
+  }
 
   return payload;
 }

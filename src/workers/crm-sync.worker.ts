@@ -109,25 +109,38 @@ export async function processSingleSyncJob(
       ['Mobile']
     );
 
-    // 3. Search & Upsert Website Enquiry in Zoho CRM
-    const enquiryPayload = mapSubmissionToZohoEnquiryPayload(submission, contactResult.zohoId);
-    
-    try {
-      const searchEnquiryCriteria = `((Website_Entry_ID:equals:${submission.crmExternalKey}) or (Name:equals:${submission.crmExternalKey}))`;
-      const existingEnquiries = await zohoHttpClient.searchRecords(config.enquiryModule, searchEnquiryCriteria);
-      if (existingEnquiries && existingEnquiries.length > 0 && existingEnquiries[0]?.id) {
-        enquiryPayload.id = existingEnquiries[0].id;
-        logger.info(`Found existing Zoho Enquiry ID ${enquiryPayload.id} for entry ${submission.crmExternalKey}. Updating.`);
-      }
-    } catch (err) {
-      logger.warn(`Enquiry search failed for ${submission.crmExternalKey}, falling back to upsert`, { err });
-    }
+    let enquiryResult = contactResult;
 
-    const enquiryResult = await zohoHttpClient.upsertRecord(
-      config.enquiryModule,
-      enquiryPayload,
-      ['Website_Entry_ID']
-    );
+    // Only execute separate enquiry upsert if enquiryModule is defined and different from contactsModule
+    const isSeparateEnquiryModule =
+      Boolean(config.enquiryModule) &&
+      config.enquiryModule.trim().toLowerCase() !== config.contactsModule.trim().toLowerCase();
+
+    if (isSeparateEnquiryModule) {
+      // 3. Search & Upsert Website Enquiry in Zoho CRM (separate custom module)
+      const enquiryPayload = mapSubmissionToZohoEnquiryPayload(submission, contactResult.zohoId);
+
+      try {
+        const searchEnquiryCriteria = `((Website_Entry_ID:equals:${submission.crmExternalKey}) or (Name:equals:${submission.crmExternalKey}))`;
+        const existingEnquiries = await zohoHttpClient.searchRecords(config.enquiryModule, searchEnquiryCriteria);
+        if (existingEnquiries && existingEnquiries.length > 0 && existingEnquiries[0]?.id) {
+          enquiryPayload.id = existingEnquiries[0].id;
+          logger.info(`Found existing Zoho Enquiry ID ${enquiryPayload.id} for entry ${submission.crmExternalKey}. Updating.`);
+        }
+      } catch (err) {
+        logger.warn(`Enquiry search failed for ${submission.crmExternalKey}, falling back to upsert`, { err });
+      }
+
+      enquiryResult = await zohoHttpClient.upsertRecord(
+        config.enquiryModule,
+        enquiryPayload,
+        ['Website_Entry_ID']
+      );
+    } else {
+      logger.info(
+        `Zoho integration configured for single module '${config.contactsModule}'. Skipped 2nd upsert call to prevent duplicate records.`
+      );
+    }
 
     const completedAt = new Date();
 
