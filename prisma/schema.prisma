@@ -313,5 +313,17 @@ model AdminAuditLog {
   @@map("admin_audit_log")
 }
 
+model PinCode {
+  pinCode   String   @id @map("pin_code")
+  location  String?  @map("location")
+  city      String
+  state     String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("pincodes")
+}
+
+
 
 
