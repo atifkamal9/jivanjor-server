@@ -12,6 +12,41 @@ export interface ZohoUpsertResult {
 
 export class ZohoHttpClient {
   /**
+   * Search records in a Zoho CRM module (Contacts or Custom Module) by criteria.
+   */
+  async searchRecords(moduleName: string, criteria: string): Promise<any[]> {
+    const config = getZohoConfig();
+    const tokenInfo = await getZohoAccessToken();
+
+    const url = `${tokenInfo.apiDomain}/crm/${config.apiVersion}/${moduleName}/search?criteria=${encodeURIComponent(criteria)}`;
+
+    try {
+      logger.info(`Searching Zoho CRM module ${moduleName} with criteria: ${criteria}`);
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          Authorization: `Zoho-oauthtoken ${tokenInfo.value}`,
+        },
+      });
+
+      if (response.status === 204 || response.status === 404) {
+        return [];
+      }
+
+      if (!response.ok) {
+        logger.warn(`Zoho search returned HTTP ${response.status} for module ${moduleName}`);
+        return [];
+      }
+
+      const body = (await response.json()) as any;
+      return body?.data || [];
+    } catch (err) {
+      logger.error(`Error searching Zoho CRM module ${moduleName}:`, { err });
+      return [];
+    }
+  }
+
+  /**
    * Upsert a single record in a Zoho CRM module (Contacts or Custom Module).
    */
   async upsertRecord(
