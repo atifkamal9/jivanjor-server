@@ -27,6 +27,8 @@ export const ZOHO_CONTACT_FIELDS = {
   LEAD_SOURCE: 'Lead_Source',
   SOURCE: 'Source',
   WEBSITE_SOURCE: 'Website_Source',
+  CONTACT_STATUS: 'Contact_Status',
+  STATUS: 'Status',
 } as const;
 
 export const ZOHO_ENQUIRY_FIELDS = { ...ZOHO_CONTACT_FIELDS } as const;

@@ -26,6 +26,7 @@ export function mapSubmissionToZohoEnquiryPayload(
     State: submission.state || '',
     Mailing_State: submission.state || '',
     Description: submission.message || `${contactType} form submission on Jivanjor website`,
+    Contact_Status: 'Open',
 
     // Name & Firm
     First_Name: firstName,
@@ -45,6 +46,8 @@ export function mapSubmissionToZohoEnquiryPayload(
     Website_Source: 'Jivanjor Website',
 
     // Fallback alias fields
+    Status: 'Open',
+    Contact_status: 'Open',
     City: submission.city || '',
     Mailing_City: submission.city || '',
     District: submission.city || '',
