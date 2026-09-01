@@ -58,6 +58,7 @@ export function mapSubmissionToZohoContactPayload(submission: FormSubmission): R
     State: submission.state || '',
     Mailing_State: submission.state || '',
     Description: submission.message || `${contactType} form submission on Jivanjor website`,
+    Contact_Status: 'Open',
 
     // Core Name & Email fields
     First_Name: firstName,
@@ -72,6 +73,8 @@ export function mapSubmissionToZohoContactPayload(submission: FormSubmission): R
     Website_Source: 'Jivanjor Website',
 
     // Fallback alias fields for full CRM compatibility
+    Status: 'Open',
+    Contact_status: 'Open',
     Mailing_City: submission.city || '',
     City: submission.city || '',
     District: submission.city || '',
