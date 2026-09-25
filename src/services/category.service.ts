@@ -76,11 +76,12 @@ export class CategoryService {
    * Create a new category
    */
   static async create(input: CreateCategoryInput) {
-    const { name, parentId, description, tagline, icon, displayOrder, display_order } = input as any;
+    const { name, parentId, description, tagline, icon, image, displayOrder, display_order } = input as any;
     const finalDisplayOrder = displayOrder !== undefined ? displayOrder : (display_order !== undefined ? display_order : 0);
     const isVisibleInput = (input as any).isVisible;
     const hideInMenuInput = (input as any).hideInMenu;
     const finalIsVisible = isVisibleInput !== undefined ? isVisibleInput : (hideInMenuInput !== undefined ? !hideInMenuInput : true);
+    const finalIcon = icon !== undefined ? icon : (image !== undefined ? image : null);
 
     const slug = slugify(name);
 
@@ -109,7 +110,7 @@ export class CategoryService {
         parentId,
         description,
         tagline: tagline || null,
-        icon: icon || null,
+        icon: finalIcon || null,
         displayOrder: finalDisplayOrder,
         isVisible: finalIsVisible,
       },
@@ -120,7 +121,7 @@ export class CategoryService {
    * Update category
    */
   static async update(id: string, input: UpdateCategoryInput) {
-    const { name, parentId, description, tagline, icon, displayOrder, display_order } = input as any;
+    const { name, parentId, description, tagline, icon, image, displayOrder, display_order } = input as any;
     const finalDisplayOrder = displayOrder !== undefined ? displayOrder : display_order;
     const isVisibleInput = (input as any).isVisible;
     const hideInMenuInput = (input as any).hideInMenu;
@@ -177,9 +178,10 @@ export class CategoryService {
       dataToUpdate.tagline = tagline || null;
     }
 
-    // 4. Handle icon update
-    if (icon !== undefined) {
-      dataToUpdate.icon = icon || null;
+    // 4. Handle icon / image update
+    if (icon !== undefined || image !== undefined) {
+      const finalIcon = icon !== undefined ? icon : image;
+      dataToUpdate.icon = finalIcon || null;
     }
     if (finalDisplayOrder !== undefined) {
       dataToUpdate.displayOrder = finalDisplayOrder;
