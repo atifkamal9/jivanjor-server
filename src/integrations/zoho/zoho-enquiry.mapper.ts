@@ -8,7 +8,9 @@ export function mapSubmissionToZohoEnquiryPayload(
   const { firstName, lastName } = splitFullName(submission.fullName);
   const typeOfQuery = getQueryTypeDifferentiator(submission);
   const contactType = getContactType(submission);
-  const mobileClean = (submission.mobileNormalized || submission.mobileRaw || '').replace(/[^\d+]/g, '');
+  const mobileClean = (submission.mobileNormalized || submission.mobileRaw || '')
+    .replace(/\D/g, '')
+    .slice(-10);
 
   const payload: Record<string, any> = {
     Name: submission.crmExternalKey,
@@ -18,7 +20,7 @@ export function mapSubmissionToZohoEnquiryPayload(
     // Exact accepted Zoho CRM fields
     Pin_Code: submission.pinCode || '',
     Type_Of_Query: typeOfQuery,
-    Phone: submission.mobileRaw || mobileClean,
+    Phone: mobileClean,
     Mobile: mobileClean,
     District_City: submission.city || '',
     Current_Location: submission.location || '',
@@ -36,7 +38,7 @@ export function mapSubmissionToZohoEnquiryPayload(
     // Form metadata
     Form_Type: submission.formType,
     Full_Name_Snapshot: submission.fullName,
-    Mobile_Snapshot: submission.mobileRaw,
+    Mobile_Snapshot: mobileClean,
     Consent_Given: submission.consentGiven,
     Website_Submitted_At: submission.submittedAt.toISOString(),
 
