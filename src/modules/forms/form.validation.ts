@@ -2,23 +2,22 @@ import { z } from 'zod';
 
 
 /**
- * Normalizes mobile number to canonical digits string (E.164 format without + symbol).
- * Example: "+91 98765 43210" or "09876543210" -> "919876543210"
+ * Normalizes mobile number to canonical 10-digit string (without country code).
+ * Example: "+91 98765 43210", "919876543210", "09876543210", "9876543210" -> "9876543210"
  */
 export function normalizeMobileNumber(rawMobile: string): string {
   if (!rawMobile) return '';
-  const digitsOnly = rawMobile.replace(/\D/g, '');
+  let clean = rawMobile.replace(/\D/g, '');
 
-  if (digitsOnly.length === 10) {
-    return `91${digitsOnly}`;
+  if (clean.length === 12 && clean.startsWith('91')) {
+    clean = clean.slice(2);
+  } else if (clean.length === 11 && clean.startsWith('0')) {
+    clean = clean.slice(1);
+  } else if (clean.length > 10) {
+    clean = clean.slice(-10);
   }
-  if (digitsOnly.length === 11 && digitsOnly.startsWith('0')) {
-    return `91${digitsOnly.substring(1)}`;
-  }
-  if (digitsOnly.length === 12 && digitsOnly.startsWith('91')) {
-    return digitsOnly;
-  }
-  return digitsOnly;
+
+  return clean;
 }
 
 export function isValidIndianMobile(val: string): boolean {

@@ -42,7 +42,9 @@ export function getContactType(submission: FormSubmission): string {
 export function mapSubmissionToZohoContactPayload(submission: FormSubmission): Record<string, any> {
   const { firstName, lastName } = splitFullName(submission.fullName);
 
-  const mobileClean = (submission.mobileNormalized || submission.mobileRaw || '').replace(/[^\d+]/g, '');
+  const mobileClean = (submission.mobileNormalized || submission.mobileRaw || '')
+    .replace(/\D/g, '')
+    .slice(-10);
   const typeOfQuery = getQueryTypeDifferentiator(submission);
   const contactType = getContactType(submission);
 
@@ -50,7 +52,7 @@ export function mapSubmissionToZohoContactPayload(submission: FormSubmission): R
     // Exact accepted Zoho CRM fields
     Pin_Code: submission.pinCode || '',
     Type_Of_Query: typeOfQuery,
-    Phone: submission.mobileRaw || mobileClean,
+    Phone: mobileClean,
     Mobile: mobileClean,
     District_City: submission.city || '',
     Current_Location: submission.location || '',
