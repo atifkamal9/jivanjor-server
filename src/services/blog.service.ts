@@ -109,6 +109,7 @@ export class BlogService {
     const { title, content, category, tags, author, publishDate, image, tldr } = input;
     const authorDescription = input.authorDescription || input.author_description || null;
     const authorAvatar = input.authorAvatar || input.author_avatar || null;
+    const headerImage = input.headerImage || input.header_image || null;
     const slug = slugify(title);
 
     // Validate slug uniqueness
@@ -131,6 +132,7 @@ export class BlogService {
         authorAvatar,
         publishDate: publishDate ? new Date(publishDate) : new Date(),
         image,
+        headerImage,
         tldr,
       },
     });
@@ -200,6 +202,11 @@ export class BlogService {
 
     if (image !== undefined) {
       dataToUpdate.image = image;
+    }
+
+    const headerImage = input.headerImage !== undefined ? input.headerImage : input.header_image;
+    if (headerImage !== undefined) {
+      dataToUpdate.headerImage = headerImage;
     }
 
     if (tldr !== undefined) {
