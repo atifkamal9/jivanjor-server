@@ -194,6 +194,8 @@ export const createBlogSchema = z.object({
     author_avatar: z.string().optional().nullable(),
     publishDate: z.string().optional().nullable(),
     image: z.string().optional().nullable(),
+    headerImage: z.string().optional().nullable(),
+    header_image: z.string().optional().nullable(),
     tldr: z.string().optional().nullable(),
   }),
 });
@@ -211,6 +213,8 @@ export const updateBlogSchema = z.object({
     author_avatar: z.string().optional().nullable(),
     publishDate: z.string().optional().nullable(),
     image: z.string().optional().nullable(),
+    headerImage: z.string().optional().nullable(),
+    header_image: z.string().optional().nullable(),
     tldr: z.string().optional().nullable(),
   }),
 });

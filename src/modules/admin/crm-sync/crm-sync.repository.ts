@@ -9,16 +9,30 @@ export interface ListSubmissionsQuery {
   search?: string;
   startDate?: string;
   endDate?: string;
+  ids?: string[];
+}
+
+function parseDateBoundary(dateStr: string, isEnd: boolean): Date {
+  const trimmed = dateStr.trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+    const time = isEnd ? '23:59:59.999' : '00:00:00.000';
+    return new Date(`${trimmed}T${time}+05:30`);
+  }
+  const d = new Date(trimmed);
+  return isNaN(d.getTime()) ? new Date() : d;
 }
 
 export class CrmSyncRepository {
   async listSubmissions(query: ListSubmissionsQuery) {
     const page = Math.max(1, query.page || 1);
-    const limit = Math.min(100, Math.max(1, query.limit || 20));
+    const limit = Math.min(50000, Math.max(1, query.limit || 20));
     const skip = (page - 1) * limit;
 
     const where: Prisma.FormSubmissionWhereInput = {};
 
+    if (query.ids && query.ids.length > 0) {
+      where.id = { in: query.ids };
+    }
     if (query.formType) {
       where.formType = query.formType;
     }
@@ -28,10 +42,10 @@ export class CrmSyncRepository {
     if (query.startDate || query.endDate) {
       where.submittedAt = {};
       if (query.startDate) {
-        where.submittedAt.gte = new Date(query.startDate);
+        where.submittedAt.gte = parseDateBoundary(query.startDate, false);
       }
       if (query.endDate) {
-        where.submittedAt.lte = new Date(query.endDate);
+        where.submittedAt.lte = parseDateBoundary(query.endDate, true);
       }
     }
     if (query.search) {
@@ -63,12 +77,30 @@ export class CrmSyncRepository {
           mobileNormalized: true,
           email: true,
           city: true,
+          location: true,
+          state: true,
           pinCode: true,
           queryType: true,
+          interestedIn: true,
+          lineOfBusiness: true,
+          message: true,
+          consentGiven: true,
+          consentTextVersion: true,
+          sourceUrl: true,
+          referrerUrl: true,
+          utmSource: true,
+          utmMedium: true,
+          utmCampaign: true,
+          utmContent: true,
+          utmTerm: true,
+          gclid: true,
+          fbclid: true,
           submittedAt: true,
           zohoSyncStatus: true,
           zohoContactId: true,
           zohoEnquiryId: true,
+          zohoContactAction: true,
+          zohoEnquiryAction: true,
           zohoSyncAttempts: true,
           zohoLastHttpStatus: true,
           zohoLastErrorCode: true,
@@ -76,6 +108,7 @@ export class CrmSyncRepository {
           zohoLastAttemptAt: true,
           zohoSyncedAt: true,
           nextRetryAt: true,
+          updatedAt: true,
         },
       }),
     ]);
