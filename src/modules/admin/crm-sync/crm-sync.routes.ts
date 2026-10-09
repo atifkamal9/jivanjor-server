@@ -38,6 +38,11 @@ router.get(
     const search = req.query.search as string;
     const startDate = req.query.startDate as string;
     const endDate = req.query.endDate as string;
+    const ids = req.query.ids
+      ? typeof req.query.ids === 'string'
+        ? req.query.ids.split(',').map((id) => id.trim()).filter(Boolean)
+        : (req.query.ids as string[])
+      : undefined;
 
     const result = await crmSyncService.getSubmissions({
       page,
@@ -47,6 +52,7 @@ router.get(
       search,
       startDate,
       endDate,
+      ids,
     });
 
     res.status(200).json({
