@@ -110,14 +110,21 @@ export class BlogService {
     const authorDescription = input.authorDescription || input.author_description || null;
     const authorAvatar = input.authorAvatar || input.author_avatar || null;
     const headerImage = input.headerImage || input.header_image || null;
-    const slug = slugify(title);
+
+    // Use custom slug if provided, otherwise generate from title
+    const rawSlug = typeof input.slug === 'string' ? input.slug.trim() : '';
+    const slug = rawSlug ? slugify(rawSlug) : slugify(title);
+
+    if (!slug) {
+      throw new AppError('Unable to generate a valid slug. Please provide a title or custom slug.', HttpCode.BAD_REQUEST);
+    }
 
     // Validate slug uniqueness
     const existing = await prisma.blogPost.findUnique({
       where: { slug },
     });
     if (existing) {
-      throw new AppError(`Blog post slug '${slug}' already exists. Please choose a different title.`, HttpCode.CONFLICT);
+      throw new AppError(`Blog post slug '${slug}' already exists. Please choose a different slug or title.`, HttpCode.CONFLICT);
     }
 
     return prisma.blogPost.create({
@@ -156,20 +163,27 @@ export class BlogService {
 
     const dataToUpdate: any = {};
 
-    if (title) {
-      const slug = slugify(title);
-      if (slug !== blog.slug) {
-        const existing = await prisma.blogPost.findUnique({
-          where: { slug },
-        });
-        if (existing) {
-          throw new AppError(`Blog post slug '${slug}' already exists.`, HttpCode.CONFLICT);
-        }
-        dataToUpdate.title = title;
-        dataToUpdate.slug = slug;
-      } else {
-        dataToUpdate.title = title;
+    // Determine target slug if user explicitly provided a slug or changed title
+    let targetSlug: string | undefined;
+
+    if (typeof input.slug === 'string' && input.slug.trim() !== '') {
+      targetSlug = slugify(input.slug.trim());
+    } else if (input.slug === '' && title) {
+      targetSlug = slugify(title);
+    }
+
+    if (targetSlug && targetSlug !== blog.slug) {
+      const existing = await prisma.blogPost.findUnique({
+        where: { slug: targetSlug },
+      });
+      if (existing && existing.id !== id) {
+        throw new AppError(`Blog post slug '${targetSlug}' already exists. Please choose a different slug.`, HttpCode.CONFLICT);
       }
+      dataToUpdate.slug = targetSlug;
+    }
+
+    if (title) {
+      dataToUpdate.title = title;
     }
 
     if (content) {

@@ -1,11 +1,11 @@
 import { Router } from 'express';
 import { UploadController, multerUpload } from '../controllers/upload.controller';
-import { protect, restrictTo } from '../middleware/auth';
+import { protect, restrictToUpload } from '../middleware/auth';
 
 const router = Router();
 
-// All upload routes require authentication and ADMIN or SUPER_ADMIN role
-router.use(protect, restrictTo('ADMIN', 'SUPER_ADMIN'));
+// Protected upload routes: SUPER_ADMIN, ADMIN, or users with content permissions (e.g. manage_blogs)
+router.use(protect, restrictToUpload);
 
 /**
  * POST /api/upload
