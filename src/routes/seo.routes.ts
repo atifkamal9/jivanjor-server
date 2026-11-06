@@ -9,8 +9,18 @@ const router = Router();
 // Public routes
 router.get('/', SEOController.getOne);
 
-// Protected Admin routes
-router.use(protect, restrictToPermission('manage_settings'));
+// Protected Admin routes (Settings & Content Managers can manage SEO metadata)
+router.use(
+  protect,
+  restrictToPermission(
+    'manage_settings',
+    'manage_blogs',
+    'manage_products',
+    'manage_categories',
+    'manage_use_cases',
+    'manage_pages'
+  )
+);
 
 router.post('/', validate(createOrUpdateSEOSchema), SEOController.upsert);
 router.delete('/', SEOController.delete);

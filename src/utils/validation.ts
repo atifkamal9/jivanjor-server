@@ -184,6 +184,7 @@ export const updateIssueSchema = z.object({
 export const createBlogSchema = z.object({
   body: z.object({
     title: z.string().min(2, 'Title must be at least 2 characters'),
+    slug: z.string().optional().nullable(),
     content: z.string().min(10, 'Content must be at least 10 characters'),
     category: z.string().min(2, 'Category must be at least 2 characters'),
     tags: z.array(z.string()).optional(),
@@ -203,6 +204,7 @@ export const createBlogSchema = z.object({
 export const updateBlogSchema = z.object({
   body: z.object({
     title: z.string().min(2, 'Title must be at least 2 characters').optional(),
+    slug: z.string().optional().nullable(),
     content: z.string().min(10, 'Content must be at least 10 characters').optional(),
     category: z.string().min(2, 'Category must be at least 2 characters').optional(),
     tags: z.array(z.string()).optional(),

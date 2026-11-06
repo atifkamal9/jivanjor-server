@@ -90,3 +90,31 @@ export const restrictToPermission = (...permissionKeys: string[]) => {
     next();
   };
 };
+
+/**
+ * Restrict upload routes to SUPER_ADMIN, ADMIN, or users with content management permissions
+ */
+export const restrictToUpload = (req: Request, _res: Response, next: NextFunction) => {
+  if (!req.user) {
+    return next(new AppError('You do not have permission to perform this action.', HttpCode.FORBIDDEN));
+  }
+  // Allow all SUPER_ADMIN and ADMIN users
+  if (req.user.role === 'SUPER_ADMIN' || req.user.role === 'ADMIN') {
+    return next();
+  }
+  // Allow custom permission-based users who have content management permissions
+  const userPermissions = req.user.permissions || [];
+  const allowedPermissions = [
+    'manage_blogs',
+    'manage_products',
+    'manage_categories',
+    'manage_use_cases',
+    'manage_pages',
+    'manage_settings',
+  ];
+  const hasPermission = allowedPermissions.some((perm) => userPermissions.includes(perm));
+  if (!hasPermission) {
+    return next(new AppError('You do not have permission to upload files.', HttpCode.FORBIDDEN));
+  }
+  next();
+};
